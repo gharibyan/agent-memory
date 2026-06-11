@@ -62,6 +62,12 @@ test("github codeowners routes repository changes to gharibyan", async () => {
   assert.match(codeowners, /^\* @gharibyan$/m)
 })
 
+test("gitignore excludes local IDE project settings", async () => {
+  const gitignore = await read(".gitignore")
+
+  assert.match(gitignore, /^\.idea\/$/m)
+})
+
 test("public repo files do not mention assistant-specific tooling", async () => {
   const files = await listFiles()
   const checked = await Promise.all(files.map(async (file) => [file, await read(file)]))

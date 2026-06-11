@@ -1,6 +1,7 @@
 node_modules/
 .memory/
 .ai-memory/
+.idea/
 *.log
 *.sqlite
 *.sqlite-shm
