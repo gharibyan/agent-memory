@@ -19,7 +19,7 @@ export default tseslint.config(
     ignores: [
       ".memory/**",
       ".ai-memory/**",
-      "agent-memory-*.tgz",
+      "agent-memory-sdk-*.tgz",
       "coverage/**",
       "dist/**",
       "**/dist/**",

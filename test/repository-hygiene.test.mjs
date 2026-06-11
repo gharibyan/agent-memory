@@ -22,6 +22,7 @@ async function listFiles(dir = ".") {
     .filter((path) => !path.includes("node_modules"))
     .filter((path) => !path.includes(`${join(".", "dist")}`))
     .filter((path) => !path.includes(`${join(".", ".git")}`))
+    .filter((path) => !path.includes(`${join(".", ".idea")}`))
     .filter((path) => !path.endsWith(`${join(".", ".env")}`))
     .filter((path) => !/\.env\.(?!example$)/.test(path))
 }
@@ -30,7 +31,7 @@ test("root README and MIT license are present", async () => {
   const readme = await read("README.md")
   const license = await read("LICENSE")
 
-  assert.match(readme, /^# agent-memory/m)
+  assert.match(readme, /^# agent-memory-sdk/m)
   assert.match(readme, /MIT License/)
   assert.match(license, /^MIT License/m)
   assert.match(license, /Gharibyan/)

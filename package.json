@@ -19,11 +19,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter agent-memory build",
+    "build": "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter agent-memory-sdk build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "pnpm build && node --test packages/agent-memory/test/*.test.mjs test/*.test.mjs",
-    "pack:check": "pnpm --filter agent-memory pack --dry-run",
+    "pack:check": "pnpm --filter agent-memory-sdk pack --dry-run",
     "version:from-tag": "node scripts/sync-package-version-from-tag.mjs"
   },
   "devDependencies": {

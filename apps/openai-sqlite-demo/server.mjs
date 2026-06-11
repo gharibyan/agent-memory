@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises"
 import { existsSync } from "node:fs"
 import { dirname, resolve, relative } from "node:path"
 import { fileURLToPath } from "node:url"
-import { createAgent, openai, sqliteMemory } from "agent-memory"
+import { createAgent, openai, sqliteMemory } from "agent-memory-sdk"
 
 const appDir = dirname(fileURLToPath(import.meta.url))
 const rootDir = resolve(appDir, "../..")

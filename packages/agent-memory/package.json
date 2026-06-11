@@ -1,6 +1,6 @@
 {
-  "name": "agent-memory",
-  "version": "0.0.0",
+  "name": "agent-memory-sdk",
+  "version": "0.0.1",
   "description": "Provider-neutral agent runtime with automatic persistent memory.",
   "type": "module",
   "author": "Gharibyan",

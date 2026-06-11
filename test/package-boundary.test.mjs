@@ -28,9 +28,10 @@ test("root and playground packages are private", async () => {
   assert.equal(openAISqliteDemoPackage.private, true)
 })
 
-test("published agent-memory package uses a restrictive files allowlist", async () => {
+test("published agent-memory-sdk package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/agent-memory/package.json")
 
+  assert.equal(packageJson.name, "agent-memory-sdk")
   assert.equal(packageJson.private, undefined)
   assert.deepEqual(packageJson.files, [
     "dist",
