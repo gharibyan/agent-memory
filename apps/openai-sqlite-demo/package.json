@@ -1,0 +1,11 @@
+{
+  "name": "@agent-memory/openai-sqlite-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs"
+  },
+  "dependencies": {
+    "agent-memory": "workspace:*"
+  }
+}

@@ -24,6 +24,12 @@ importers:
         specifier: ^8.48.1
         version: 8.61.0(eslint@9.39.4)(typescript@5.9.3)
 
+  apps/openai-sqlite-demo:
+    dependencies:
+      agent-memory:
+        specifier: workspace:*
+        version: link:../../packages/agent-memory
+
   apps/playground:
     dependencies:
       agent-memory:

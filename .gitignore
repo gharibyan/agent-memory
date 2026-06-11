@@ -2,6 +2,10 @@ node_modules/
 .memory/
 .ai-memory/
 .idea/
+.env
+.env.*
+!.env.example
+!apps/**/.env.example
 *.log
 *.sqlite
 *.sqlite-shm

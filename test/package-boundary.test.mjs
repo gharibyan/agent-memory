@@ -21,9 +21,11 @@ async function listFiles(dir) {
 test("root and playground packages are private", async () => {
   const rootPackage = await readJson("package.json")
   const playgroundPackage = await readJson("apps/playground/package.json")
+  const openAISqliteDemoPackage = await readJson("apps/openai-sqlite-demo/package.json")
 
   assert.equal(rootPackage.private, true)
   assert.equal(playgroundPackage.private, true)
+  assert.equal(openAISqliteDemoPackage.private, true)
 })
 
 test("published agent-memory package uses a restrictive files allowlist", async () => {
