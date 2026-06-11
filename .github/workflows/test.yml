@@ -50,6 +50,9 @@ jobs:
       - name: Verify SQLite adapter package contents
         run: pnpm --filter @agent-memory/sqlite pack --dry-run
 
+      - name: Verify Postgres adapter package contents
+        run: pnpm --filter @agent-memory/postgres pack --dry-run
+
       - name: Verify OpenAI adapter package contents
         run: pnpm --filter @agent-memory/openai pack --dry-run
 

@@ -61,6 +61,24 @@ test("sqlite persistence lives in its own publishable storage adapter package", 
   assert.doesNotMatch(coreIndex, /sqliteMemory/)
 })
 
+test("postgres persistence lives in its own publishable storage adapter package", async () => {
+  const packageJson = await readJson("packages/postgres/package.json")
+  const source = await read("packages/postgres/src/index.ts")
+  const coreIndex = await read("packages/core/src/index.ts")
+
+  assert.equal(packageJson.name, "@agent-memory/postgres")
+  assert.equal(packageJson.main, "./dist/index.js")
+  assert.equal(packageJson.types, "./dist/index.d.ts")
+  assert.deepEqual(packageJson.files, ["dist", "README.md", "package.json"])
+  assert.equal(packageJson.dependencies["@agent-memory/core"], "workspace:*")
+  assert.match(packageJson.dependencies.pg, /^\^/)
+  assert.match(source, /CREATE EXTENSION IF NOT EXISTS vector/)
+  assert.match(source, /CREATE TABLE IF NOT EXISTS/)
+  assert.match(source, /export function postgresMemory/)
+  assert.doesNotMatch(coreIndex, /pg/)
+  assert.doesNotMatch(coreIndex, /postgresMemory/)
+})
+
 test("public package re-exports the openai adapter as a convenience import", async () => {
   const packageJson = await readJson("packages/agent-memory/package.json")
   const source = await read("packages/agent-memory/src/index.ts")
@@ -68,10 +86,12 @@ test("public package re-exports the openai adapter as a convenience import", asy
   assert.equal(packageJson.dependencies["@agent-memory/openai"], "workspace:*")
   assert.equal(packageJson.dependencies["@agent-memory/local"], "workspace:*")
   assert.equal(packageJson.dependencies["@agent-memory/sqlite"], "workspace:*")
+  assert.equal(packageJson.dependencies["@agent-memory/postgres"], "workspace:*")
   assert.match(source, /export \* from "@agent-memory\/core"/)
   assert.match(source, /export \{ openAICompatible, openai \} from "@agent-memory\/openai"/)
   assert.match(source, /export \{ localMemory \} from "@agent-memory\/local"/)
   assert.match(source, /export \{ sqliteMemory \} from "@agent-memory\/sqlite"/)
+  assert.match(source, /export \{ postgresMemory \} from "@agent-memory\/postgres"/)
 })
 
 test("built openai adapter exposes OpenAI-compatible provider helpers", async () => {
@@ -105,3 +125,17 @@ test("built sqlite adapter exposes real SQLite memory helper", async () => {
 
   assert.equal(sqliteMemory().kind, "sqlite")
 })
+
+test("built postgres adapter exposes pgvector-backed memory helper", async () => {
+  const { postgresMemory } = await import("../packages/postgres/dist/index.js")
+
+  assert.equal(postgresMemory({ pool: createNoopPool() }).kind, "postgres")
+})
+
+function createNoopPool() {
+  return {
+    async query() {
+      return { rows: [] }
+    }
+  }
+}

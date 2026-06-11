@@ -85,12 +85,31 @@ const agent = createAgent({
 })
 ```
 
+For Postgres with pgvector:
+
+```ts
+import { createAgent, openai, postgresMemory } from "agent-memory"
+
+const agent = createAgent({
+  model: openai("gpt-5"),
+  memory: {
+    store: postgresMemory({
+      connectionString: process.env.DATABASE_URL,
+      vectorDimensions: 1536
+    })
+  }
+})
+```
+
+The Postgres adapter runs migrations automatically before the first memory operation. It creates the pgvector extension by default, version-tracks migrations, creates relational memory tables, and adds an HNSW cosine index for vector search. If your database provider manages extensions separately, install pgvector in the database and pass `createExtension: false`.
+
 ## Packages
 
 - `agent-memory`: public convenience package with automatic local memory defaults.
 - `@agent-memory/core`: runtime-neutral engine, contracts, compiler, retrieval, and in-memory store.
 - `@agent-memory/local`: local JSON persistence adapter.
 - `@agent-memory/sqlite`: real SQLite persistence adapter.
+- `@agent-memory/postgres`: Postgres persistence adapter with pgvector migrations.
 - `@agent-memory/openai`: OpenAI-compatible model adapter.
 
 ## Playground

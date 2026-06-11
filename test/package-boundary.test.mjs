@@ -84,6 +84,20 @@ test("published sqlite adapter package uses a restrictive files allowlist", asyn
   assert.equal(packageJson.files.includes(".ai-memory"), false)
 })
 
+test("published postgres adapter package uses a restrictive files allowlist", async () => {
+  const packageJson = await readJson("packages/postgres/package.json")
+
+  assert.equal(packageJson.private, undefined)
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "README.md",
+    "package.json"
+  ])
+  assert.equal(packageJson.files.includes("../../apps/playground"), false)
+  assert.equal(packageJson.files.includes(".memory"), false)
+  assert.equal(packageJson.files.includes(".ai-memory"), false)
+})
+
 test("published openai adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/openai/package.json")
 

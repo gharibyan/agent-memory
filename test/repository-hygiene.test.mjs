@@ -42,6 +42,7 @@ test("publishable packages point to the gharibyan GitHub repository", async () =
     "packages/core/package.json",
     "packages/local/package.json",
     "packages/sqlite/package.json",
+    "packages/postgres/package.json",
     "packages/openai/package.json"
   ]) {
     const packageJson = await readJson(path)

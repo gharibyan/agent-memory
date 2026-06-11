@@ -23,6 +23,7 @@ Use this when:
 - `@agent-memory/core`: runtime-neutral engine, contracts, compiler, retrieval, in-memory store. No Node `fs`, provider SDKs, or database drivers.
 - `@agent-memory/local`: local `.memory/memory.json` persistence.
 - `@agent-memory/sqlite`: real SQLite `.memory/memory.sqlite` persistence.
+- `@agent-memory/postgres`: Postgres persistence with automatic migrations and pgvector retrieval.
 - `@agent-memory/openai`: OpenAI-compatible chat completions, including custom `baseURL` providers.
 - `agent-memory`: public convenience package. `createAgent({ model })` should work with automatic local memory.
 
@@ -59,7 +60,7 @@ const result = await agent.generate({
 
 For a provider adapter, create a package like `@agent-memory/openai` and return a `ModelProvider`.
 
-For a storage adapter, create a package like `@agent-memory/local` and implement `MemoryStore`.
+For a storage adapter, create a package like `@agent-memory/local` and implement `MemoryStore`. Database adapters should own their migration lifecycle instead of making application code run setup manually.
 
 Keep core dependency-free and runtime-neutral.
 

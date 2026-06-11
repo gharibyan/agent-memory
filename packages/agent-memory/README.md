@@ -27,4 +27,4 @@ const result = await agent.generate({
 console.log(result.text)
 ```
 
-If `userId` is omitted, memory is stored in the shared default scope. Local memory defaults to `.memory/memory.json`; use `sqliteMemory()` for `.memory/memory.sqlite`.
+If `userId` is omitted, memory is stored in the shared default scope. Local memory defaults to `.memory/memory.json`; use `sqliteMemory()` for `.memory/memory.sqlite` or `postgresMemory()` for Postgres with automatic pgvector migrations.
