@@ -27,6 +27,125 @@ const agent = createAgent({
   }
 })
 
+const scenarios = [
+  {
+    id: "customer-support",
+    title: "Customer support",
+    summary: "Teach the agent tone, escalation rules, and customer context.",
+    scope: {
+      userId: "support-agent-maya",
+      orgId: "acme-support",
+      threadId: "refund-thread",
+      operationId: "ticket-4482"
+    },
+    steps: [
+      {
+        id: "support-tone",
+        label: "Remember tone",
+        message: "Remember that I prefer customer replies that are calm, concise, and include one clear next step."
+      },
+      {
+        id: "support-escalation",
+        label: "Remember escalation rule",
+        message: "Do not promise refunds over $500 without escalating to billing operations."
+      },
+      {
+        id: "support-recall",
+        label: "Try recall",
+        recall: true,
+        message: "Draft a reply for a customer asking for a $900 refund after a delayed shipment."
+      }
+    ]
+  },
+  {
+    id: "sales-crm",
+    title: "Sales CRM",
+    summary: "Show buyer preferences, follow-up constraints, and account context.",
+    scope: {
+      userId: "ae-jordan",
+      orgId: "northstar-sales",
+      threadId: "atlas-account",
+      operationId: "q3-renewal"
+    },
+    steps: [
+      {
+        id: "sales-buyer",
+        label: "Remember buyer",
+        message: "Remember that Atlas Bank prefers ROI summaries before technical architecture details."
+      },
+      {
+        id: "sales-follow-up",
+        label: "Remember follow-up",
+        message: "Do not schedule follow-ups on Fridays for Atlas Bank."
+      },
+      {
+        id: "sales-recall",
+        label: "Try recall",
+        recall: true,
+        message: "Write the next follow-up email for Atlas Bank after a pricing call."
+      }
+    ]
+  },
+  {
+    id: "personal-assistant",
+    title: "Personal assistant",
+    summary: "Capture schedule style, reporting preferences, and durable personal facts.",
+    scope: {
+      userId: "founder-alex",
+      orgId: "",
+      threadId: "daily-planning",
+      operationId: "weekly-review"
+    },
+    steps: [
+      {
+        id: "assistant-style",
+        label: "Remember style",
+        message: "Remember that I prefer daily plans grouped by energy level, not by hour."
+      },
+      {
+        id: "assistant-work",
+        label: "Remember fact",
+        message: "Remember that I work at Northstar Labs."
+      },
+      {
+        id: "assistant-recall",
+        label: "Try recall",
+        recall: true,
+        message: "Create tomorrow's planning brief for me."
+      }
+    ]
+  },
+  {
+    id: "product-ops",
+    title: "Product ops",
+    summary: "Track product decisions and constraints across a longer operation.",
+    scope: {
+      userId: "pm-rina",
+      orgId: "agent-memory",
+      threadId: "demo-product",
+      operationId: "launch-readiness"
+    },
+    steps: [
+      {
+        id: "ops-decision",
+        label: "Remember decision",
+        message: "Remember that the first launch demo should prioritize SQLite memory over Postgres setup."
+      },
+      {
+        id: "ops-constraint",
+        label: "Remember constraint",
+        message: "Do not expose provider API keys in browser code or static deployment settings."
+      },
+      {
+        id: "ops-recall",
+        label: "Try recall",
+        recall: true,
+        message: "Summarize the launch demo plan and call out the most important constraint."
+      }
+    ]
+  }
+]
+
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url ?? "/", `http://${req.headers.host}`)
@@ -37,6 +156,10 @@ createServer(async (req, res) => {
 
     if (req.method === "GET" && url.pathname === "/api/status") {
       return sendJson(res, statusPayload())
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/scenarios") {
+      return sendJson(res, { scenarios })
     }
 
     if (req.method === "GET" && url.pathname === "/api/memory") {
@@ -88,6 +211,20 @@ createServer(async (req, res) => {
         memory: result.memory,
         memories,
         events: recentEvents(exported.events),
+        memoryFlow: buildMemoryFlow({
+          body,
+          scope,
+          memories,
+          result,
+          events: recentEvents(exported.events)
+        }),
+        scenarioTimeline: buildScenarioTimeline(body.scenarioId, body.stepId),
+        explanation: explainInteraction({
+          body,
+          result,
+          memories,
+          events: recentEvents(exported.events)
+        }),
         status: statusPayload()
       })
     }
@@ -195,6 +332,62 @@ function missingKeyPayload() {
   }
 }
 
+function buildMemoryFlow(input) {
+  const recallEnabled = input.body.recall !== false
+  const learnEnabled = input.body.learn !== false
+  const used = input.result.memory?.used ?? []
+  const created = input.result.memory?.created ?? []
+  const ignored = input.result.memory?.ignored ?? []
+
+  return {
+    scope: input.scope,
+    model,
+    contextBudget: numberOrUndefined(input.body.contextBudget) ?? contextBudget,
+    recallEnabled,
+    learnEnabled,
+    requestStoredAsEvent: true,
+    assistantReplyStoredAsEvent: true,
+    memoriesUsed: used,
+    memoriesCreated: created,
+    memoriesIgnored: ignored,
+    activeMemoryCount: input.memories.length,
+    recentEventCount: input.events.length
+  }
+}
+
+function buildScenarioTimeline(scenarioId, stepId) {
+  const scenario = scenarios.find((item) => item.id === scenarioId)
+  if (!scenario) return []
+
+  return scenario.steps.map((step, index) => ({
+    id: step.id,
+    label: step.label,
+    status: step.id === stepId ? "current" : index < scenario.steps.findIndex((item) => item.id === stepId) ? "previous" : "upcoming",
+    recall: step.recall === true
+  }))
+}
+
+function explainInteraction(input) {
+  const used = input.result.memory?.used ?? []
+  const created = input.result.memory?.created ?? []
+  const ignored = input.result.memory?.ignored ?? []
+
+  return {
+    whatHappened: [
+      "The server accepted the browser message without exposing the OpenAI API key.",
+      `agent-memory searched the current scope and injected ${used.length} relevant memories into the model request.`,
+      "The assistant response was returned and persisted as an event alongside the user message.",
+      `The deterministic compiler created ${created.length} memories and ignored ${ignored.length} candidates.`
+    ],
+    howItWorks: [
+      "Scope fields decide which memory buckets can be recalled.",
+      "Recall controls whether active memories are packed into the model context.",
+      "Learn controls whether this interaction can create durable memories.",
+      "SQLite persists events and memory records under the configured server-side database path."
+    ]
+  }
+}
+
 function sendJson(res, value, status = 200) {
   res.writeHead(status, { "content-type": "application/json" })
   res.end(JSON.stringify(value, null, 2))
@@ -246,9 +439,19 @@ function page() {
     .pill.ok { color: var(--green); border-color: #b8dec9; }
     .pill.warn { color: var(--amber); border-color: #ead29a; }
     .workspace { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(300px, 420px); gap: 14px; padding: 14px; min-height: 0; }
+    .left-stack { display: grid; gap: 14px; align-content: start; }
     .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
     .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .scenario-list { display: grid; gap: 8px; }
+    .scenario { display: grid; gap: 4px; text-align: left; justify-content: stretch; }
+    .scenario.active { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(36, 87, 214, .12); }
+    .scenario strong { font-size: 13px; }
+    .scenario span { color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .scenario-steps { display: grid; gap: 8px; }
+    .scenario-step { display: grid; gap: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 9px; background: #fbfcfd; }
+    .scenario-step strong { font-size: 13px; }
+    .scenario-step p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
     .chat { min-height: 0; grid-template-rows: auto 1fr auto; }
     .messages { display: grid; align-content: start; gap: 10px; overflow: auto; min-height: 360px; padding-right: 4px; }
     .message { border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #fbfcfd; white-space: pre-wrap; line-height: 1.45; }
@@ -259,6 +462,11 @@ function page() {
     .memory { border: 1px solid var(--line); border-radius: 8px; padding: 9px; background: #fbfcfd; }
     .memory strong { display: block; font-size: 12px; margin-bottom: 4px; }
     .memory p { margin: 0; color: var(--text); font-size: 13px; line-height: 1.35; }
+    .flow-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .metric { border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: #fbfcfd; }
+    .metric strong { display: block; font-size: 18px; }
+    .metric span { color: var(--muted); font-size: 11px; }
+    .explain-list { margin: 0; padding-left: 18px; color: var(--text); font-size: 13px; line-height: 1.4; }
     .empty { color: var(--muted); font-size: 13px; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
     .toggles { display: grid; gap: 8px; }
     .toggle { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text); }
@@ -279,35 +487,43 @@ function page() {
     </header>
 
     <div class="workspace">
-      <section class="panel">
-        <h2>Scope</h2>
-        <div class="grid2">
-          <label>User<input id="userId" value="demo-user"></label>
-          <label>Thread<input id="threadId" value="demo-thread"></label>
-        </div>
-        <div class="grid2">
-          <label>Org<input id="orgId" placeholder="optional"></label>
-          <label>Operation<input id="operationId" value="demo-onboarding"></label>
-        </div>
-        <div class="grid2">
-          <label>Temperature<input id="temperature" type="number" min="0" max="2" step="0.1" value="0.3"></label>
-          <label>Max tokens<input id="maxTokens" type="number" min="64" step="32" value="512"></label>
-        </div>
-        <label>Context budget<input id="contextBudget" type="number" min="200" step="100" value="1400"></label>
-        <div class="toggles">
-          <label class="toggle"><input id="recall" type="checkbox" checked> Recall memory</label>
-          <label class="toggle"><input id="learn" type="checkbox" checked> Learn from this message</label>
-        </div>
-        <div class="row">
-          <button data-example="Remember that I prefer concise answers with bullet points.">Preference</button>
-          <button data-example="Remember that I work at Northstar Labs.">Fact</button>
-          <button data-example="Do not use emojis in product updates.">Constraint</button>
-        </div>
-        <div class="row">
-          <button id="refresh">Refresh</button>
-          <button id="forget" class="danger">Forget scope</button>
-        </div>
-      </section>
+      <div class="left-stack">
+        <section class="panel">
+          <h2>Real-life scenarios</h2>
+          <div id="scenarioList" class="scenario-list"></div>
+          <div id="scenarioSteps" class="scenario-steps"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Scope</h2>
+          <div class="grid2">
+            <label>User<input id="userId" value="demo-user"></label>
+            <label>Thread<input id="threadId" value="demo-thread"></label>
+          </div>
+          <div class="grid2">
+            <label>Org<input id="orgId" placeholder="optional"></label>
+            <label>Operation<input id="operationId" value="demo-onboarding"></label>
+          </div>
+          <div class="grid2">
+            <label>Temperature<input id="temperature" type="number" min="0" max="2" step="0.1" value="0.3"></label>
+            <label>Max tokens<input id="maxTokens" type="number" min="64" step="32" value="512"></label>
+          </div>
+          <label>Context budget<input id="contextBudget" type="number" min="200" step="100" value="1400"></label>
+          <div class="toggles">
+            <label class="toggle"><input id="recall" type="checkbox" checked> Recall memory</label>
+            <label class="toggle"><input id="learn" type="checkbox" checked> Learn from this message</label>
+          </div>
+          <div class="row">
+            <button data-example="Remember that I prefer concise answers with bullet points.">Preference</button>
+            <button data-example="Remember that I work at Northstar Labs.">Fact</button>
+            <button data-example="Do not use emojis in product updates.">Constraint</button>
+          </div>
+          <div class="row">
+            <button id="refresh">Refresh</button>
+            <button id="forget" class="danger">Forget scope</button>
+          </div>
+        </section>
+      </div>
 
       <section class="panel chat">
         <h2>Conversation</h2>
@@ -322,6 +538,12 @@ function page() {
       <section class="panel inspector">
         <h2>Memory</h2>
         <div id="memoryList" class="memory-list"></div>
+        <h2>Response data</h2>
+        <div id="flowSummary" class="flow-grid"></div>
+        <h2>What happened</h2>
+        <ol id="whatHappened" class="explain-list"></ol>
+        <h2>How it works</h2>
+        <ol id="howItWorks" class="explain-list"></ol>
         <h2>Debug</h2>
         <pre id="debug">{}</pre>
       </section>
@@ -329,7 +551,9 @@ function page() {
   </main>
 
   <script>
+    const scenarioData = ${JSON.stringify(scenarios)}
     const state = {
+      activeScenarioId: scenarioData[0]?.id,
       messages: []
     }
     const els = {
@@ -348,11 +572,16 @@ function page() {
       orgId: document.querySelector("#orgId"),
       recall: document.querySelector("#recall"),
       refresh: document.querySelector("#refresh"),
+      flowSummary: document.querySelector("#flowSummary"),
+      howItWorks: document.querySelector("#howItWorks"),
+      scenarioList: document.querySelector("#scenarioList"),
+      scenarioSteps: document.querySelector("#scenarioSteps"),
       send: document.querySelector("#send"),
       temperature: document.querySelector("#temperature"),
       contextBudget: document.querySelector("#contextBudget"),
       threadId: document.querySelector("#threadId"),
-      userId: document.querySelector("#userId")
+      userId: document.querySelector("#userId"),
+      whatHappened: document.querySelector("#whatHappened")
     }
 
     function scope() {
@@ -372,7 +601,8 @@ function page() {
         maxTokens: els.maxTokens.value,
         contextBudget: els.contextBudget.value,
         recall: els.recall.checked,
-        learn: els.learn.checked
+        learn: els.learn.checked,
+        scenarioId: state.activeScenarioId
       }
     }
 
@@ -410,6 +640,72 @@ function page() {
         : '<div class="empty">No active memory for this scope.</div>'
     }
 
+    function renderScenarios() {
+      els.scenarioList.innerHTML = scenarioData.map((scenario) => (
+        '<button class="scenario ' + (scenario.id === state.activeScenarioId ? 'active' : '') + '" data-scenario-id="' + escapeHtml(scenario.id) + '">' +
+        '<strong>' + escapeHtml(scenario.title) + '</strong>' +
+        '<span>' + escapeHtml(scenario.summary) + '</span>' +
+        '</button>'
+      )).join("")
+      els.scenarioList.querySelectorAll("[data-scenario-id]").forEach((button) => {
+        button.addEventListener("click", () => selectScenario(button.dataset.scenarioId))
+      })
+      renderScenarioSteps()
+    }
+
+    function renderScenarioSteps() {
+      const scenario = currentScenario()
+      els.scenarioSteps.innerHTML = scenario
+        ? scenario.steps.map((step) => (
+          '<div class="scenario-step">' +
+          '<strong>' + escapeHtml(step.label) + '</strong>' +
+          '<p>' + escapeHtml(step.message) + '</p>' +
+          '<div class="row">' +
+          '<button data-step-id="' + escapeHtml(step.id) + '">Run scenario step</button>' +
+          (step.recall ? '<button data-recall-id="' + escapeHtml(step.id) + '">Try recall</button>' : '') +
+          '</div>' +
+          '</div>'
+        )).join("")
+        : '<div class="empty">Choose a scenario.</div>'
+      els.scenarioSteps.querySelectorAll("[data-step-id]").forEach((button) => {
+        button.addEventListener("click", () => runScenarioStep(button.dataset.stepId))
+      })
+      els.scenarioSteps.querySelectorAll("[data-recall-id]").forEach((button) => {
+        button.addEventListener("click", () => runScenarioStep(button.dataset.recallId))
+      })
+    }
+
+    function selectScenario(id) {
+      state.activeScenarioId = id
+      const scenario = currentScenario()
+      if (scenario) applyScope(scenario.scope)
+      renderScenarios()
+      refresh().catch(renderDebug)
+    }
+
+    function currentScenario() {
+      return scenarioData.find((scenario) => scenario.id === state.activeScenarioId)
+    }
+
+    function currentStep(id) {
+      return currentScenario()?.steps.find((step) => step.id === id)
+    }
+
+    function applyScope(value) {
+      els.userId.value = value.userId ?? ""
+      els.orgId.value = value.orgId ?? ""
+      els.threadId.value = value.threadId ?? ""
+      els.operationId.value = value.operationId ?? ""
+    }
+
+    function runScenarioStep(stepId) {
+      const step = currentStep(stepId)
+      if (!step) return
+      els.message.value = step.message
+      els.recall.checked = step.recall === true || els.recall.checked
+      send(step.message, step.id)
+    }
+
     function renderStatus(status) {
       els.keyStatus.textContent = status.hasOpenAIKey ? "Key configured" : "Key missing"
       els.keyStatus.className = "pill " + (status.hasOpenAIKey ? "ok" : "warn")
@@ -422,6 +718,29 @@ function page() {
       els.debug.textContent = JSON.stringify(value, null, 2)
     }
 
+    function renderFlow(value) {
+      const flow = value?.memoryFlow
+      const explanation = value?.explanation
+      els.flowSummary.innerHTML = flow
+        ? [
+            metric("Used", flow.memoriesUsed.length),
+            metric("Created", flow.memoriesCreated.length),
+            metric("Ignored", flow.memoriesIgnored.length),
+            metric("Events", flow.recentEventCount)
+          ].join("")
+        : '<div class="empty">Send a message to see response data.</div>'
+      els.whatHappened.innerHTML = explanation?.whatHappened?.length
+        ? explanation.whatHappened.map((item) => '<li>' + escapeHtml(item) + '</li>').join("")
+        : '<li>Send a scenario step to see what happened.</li>'
+      els.howItWorks.innerHTML = explanation?.howItWorks?.length
+        ? explanation.howItWorks.map((item) => '<li>' + escapeHtml(item) + '</li>').join("")
+        : '<li>Memory flow details will appear after the first response.</li>'
+    }
+
+    function metric(label, value) {
+      return '<div class="metric"><strong>' + escapeHtml(value) + '</strong><span>' + escapeHtml(label) + '</span></div>'
+    }
+
     async function refresh() {
       const [status, memory] = await Promise.all([
         json("/api/status"),
@@ -429,10 +748,11 @@ function page() {
       ])
       renderStatus(status)
       renderMemory(memory.memories)
+      renderFlow(null)
       renderDebug({ status, memories: memory.memories, events: memory.events })
     }
 
-    async function send(message) {
+    async function send(message, stepId) {
       const text = message ?? els.message.value
       if (!text.trim()) return
       setBusy(true)
@@ -442,11 +762,12 @@ function page() {
         const result = await json("/api/chat", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ ...payload(), message: text })
+          body: JSON.stringify({ ...payload(), message: text, stepId })
         })
         state.messages.push({ role: "assistant", content: result.text })
         renderStatus(result.status)
         renderMemory(result.memories)
+        renderFlow(result)
         renderDebug(result)
       } catch (error) {
         renderDebug(error)
@@ -461,6 +782,8 @@ function page() {
       els.ask.disabled = value
       els.refresh.disabled = value
       els.forget.disabled = value
+      els.scenarioList.querySelectorAll("button").forEach((button) => { button.disabled = value })
+      els.scenarioSteps.querySelectorAll("button").forEach((button) => { button.disabled = value })
     }
 
     function escapeHtml(value) {
@@ -494,6 +817,9 @@ function page() {
       await refresh()
     })
 
+    renderScenarios()
+    if (currentScenario()) applyScope(currentScenario().scope)
+    renderFlow(null)
     renderMessages()
     refresh().catch(renderDebug)
   </script>

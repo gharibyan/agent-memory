@@ -13,6 +13,17 @@ pnpm --filter @agent-memory/openai-sqlite-demo dev
 
 Then open [http://localhost:4318](http://localhost:4318).
 
+## Interactive Scenarios
+
+The demo includes four real-life walkthroughs:
+
+- Customer support: remembers reply tone and refund escalation rules.
+- Sales CRM: remembers buyer communication preferences and follow-up constraints.
+- Personal assistant: remembers planning style and durable user facts.
+- Product ops: remembers launch decisions and operational constraints.
+
+Each scenario has "Run scenario step" actions that teach memory and a "Try recall" action that asks the model to use what was stored. The response panels show the assistant answer, memories used, memories created, ignored memory candidates, recent events, and a plain-English explanation of how the SDK handled recall and learning.
+
 Set these values in `apps/openai-sqlite-demo/.env` or in your deployment environment:
 
 ```sh
