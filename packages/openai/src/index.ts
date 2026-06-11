@@ -1,5 +1,14 @@
+import OpenAI from "openai"
 import { customModel } from "@agent-memory/core"
-import type { ModelProvider, ModelRequest, ModelResponse, ModelStreamChunk } from "@agent-memory/core"
+import type { AgentMessage, ModelProvider, ModelRequest, ModelResponse, ModelStreamChunk } from "@agent-memory/core"
+
+export type OpenAIChatClient = {
+  chat: {
+    completions: {
+      create(input: ChatCompletionInput): Promise<OpenAIChatCompletion | AsyncIterable<OpenAIChatCompletionChunk>>
+    }
+  }
+}
 
 export type OpenAICompatibleOptions = {
   id?: string
@@ -7,6 +16,7 @@ export type OpenAICompatibleOptions = {
   baseURL?: string
   apiKey?: string
   headers?: Record<string, string>
+  client?: OpenAIChatClient
 }
 
 export function openai(
@@ -17,111 +27,124 @@ export function openai(
     ? { model: modelOrOptions, ...options }
     : modelOrOptions
 
-  return openAICompatible({
-    baseURL: "https://api.openai.com/v1",
+  return createOpenAIChatProvider({
+    idPrefix: "openai",
     apiKey: process.env.OPENAI_API_KEY,
     ...config
   })
 }
 
 export function openAICompatible(config: OpenAICompatibleOptions): ModelProvider {
+  return createOpenAIChatProvider({
+    idPrefix: "openai-compatible",
+    ...config
+  })
+}
+
+function createOpenAIChatProvider(config: OpenAICompatibleOptions & { idPrefix: string }): ModelProvider {
   if (!config.model) {
-    throw new Error("openAICompatible() requires a model")
+    throw new Error(`${config.idPrefix} provider requires a model`)
   }
 
-  const baseURL = (config.baseURL ?? "https://api.openai.com/v1").replace(/\/$/, "")
+  let client: OpenAIChatClient | undefined = config.client
+
+  function sdk(): OpenAIChatClient {
+    if (!client) {
+      client = new OpenAI({
+        apiKey: config.apiKey ?? process.env.OPENAI_API_KEY,
+        baseURL: config.baseURL,
+        defaultHeaders: config.headers
+      }) as unknown as OpenAIChatClient
+    }
+    return client
+  }
 
   return customModel({
-    id: config.id ?? `openai-compatible:${config.model}`,
+    id: config.id ?? `${config.idPrefix}:${config.model}`,
     capabilities: {
       streaming: true,
       tools: true,
       jsonSchema: true
     },
     async generate(request: ModelRequest): Promise<ModelResponse> {
-      const response = await fetch(`${baseURL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${config.apiKey}`,
-          ...config.headers
-        },
-        body: JSON.stringify({
-          model: config.model,
-          messages: request.messages,
-          temperature: request.temperature,
-          max_tokens: request.maxTokens,
-          stream: false
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error(`Model request failed with ${response.status}: ${await response.text()}`)
-      }
-
-      const json = await response.json() as OpenAICompatibleResponse
+      const completion = await sdk().chat.completions.create(chatCompletionInput(config.model, request, false))
+      const json = completion as OpenAIChatCompletion
+      const choice = json.choices?.[0]
       return {
-        text: json.choices?.[0]?.message?.content ?? "",
+        text: textFromContent(choice?.message?.content),
+        messages: choice?.message?.content ? [{ role: "assistant", content: textFromContent(choice.message.content) }] : undefined,
+        toolCalls: choice?.message?.tool_calls,
         usage: json.usage,
-        finishReason: json.choices?.[0]?.finish_reason,
+        finishReason: choice?.finish_reason,
         raw: json
       }
     },
     async *stream(request: ModelRequest): AsyncIterable<ModelStreamChunk> {
-      const response = await fetch(`${baseURL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${config.apiKey}`,
-          ...config.headers
-        },
-        body: JSON.stringify({
-          model: config.model,
-          messages: request.messages,
-          temperature: request.temperature,
-          max_tokens: request.maxTokens,
-          stream: true
-        })
-      })
+      const stream = await sdk().chat.completions.create(chatCompletionInput(config.model, request, true))
 
-      if (!response.ok || !response.body) {
-        throw new Error(`Model stream failed with ${response.status}: ${await response.text()}`)
-      }
-
-      const decoder = new TextDecoder()
-      let buffer = ""
-
-      for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
-        buffer += decoder.decode(chunk, { stream: true })
-        const lines = buffer.split("\n")
-        buffer = lines.pop() ?? ""
-
-        for (const line of lines) {
-          const trimmed = line.trim()
-          if (!trimmed.startsWith("data:")) continue
-
-          const data = trimmed.slice(5).trim()
-          if (data === "[DONE]") return
-
-          const parsed = JSON.parse(data) as OpenAICompatibleStreamChunk
-          const text = parsed.choices?.[0]?.delta?.content
-          if (text) yield text
-        }
+      for await (const chunk of stream as AsyncIterable<OpenAIChatCompletionChunk>) {
+        const text = chunk.choices?.[0]?.delta?.content
+        if (typeof text === "string" && text.length > 0) yield text
       }
     }
   })
 }
 
-type OpenAICompatibleResponse = {
+function chatCompletionInput(model: string, request: ModelRequest, stream: boolean): ChatCompletionInput {
+  return {
+    model,
+    messages: request.messages.map(openAIMessage),
+    ...(request.tools ? { tools: request.tools } : {}),
+    ...(request.temperature === undefined ? {} : { temperature: request.temperature }),
+    ...(request.maxTokens === undefined ? {} : { max_tokens: request.maxTokens }),
+    stream
+  }
+}
+
+function openAIMessage(message: AgentMessage): Record<string, unknown> {
+  return {
+    role: message.role,
+    content: message.content,
+    ...(message.toolCallId ? { tool_call_id: message.toolCallId } : {})
+  }
+}
+
+function textFromContent(content: unknown): string {
+  if (typeof content === "string") return content
+  if (!Array.isArray(content)) return ""
+
+  return content
+    .map((part) => {
+      if (part && typeof part === "object" && "text" in part) {
+        return String((part as { text?: unknown }).text ?? "")
+      }
+      return ""
+    })
+    .join("")
+}
+
+type OpenAIChatCompletion = {
   choices?: Array<{
-    message?: { content?: string }
+    message?: {
+      content?: unknown
+      tool_calls?: unknown[]
+    }
     finish_reason?: string
   }>
   usage?: unknown
 }
 
-type OpenAICompatibleStreamChunk = {
+type OpenAIChatCompletionChunk = {
   choices?: Array<{
     delta?: { content?: string }
   }>
+}
+
+type ChatCompletionInput = {
+  model: string
+  messages: Array<Record<string, unknown>>
+  tools?: unknown[]
+  temperature?: number
+  max_tokens?: number
+  stream: boolean
 }

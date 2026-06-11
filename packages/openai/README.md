@@ -1,18 +1,24 @@
 # @agent-memory/openai
 
-OpenAI-compatible model provider adapter for `agent-memory`.
+OpenAI model provider adapter for `agent-memory`, backed by the official `openai` TypeScript SDK.
 
 ```ts
 import { createAgent } from "agent-memory"
-import { openAICompatible } from "@agent-memory/openai"
+import { openai } from "@agent-memory/openai"
 
 const agent = createAgent({
-  model: openAICompatible({
-    model: "deepseek-chat",
-    baseURL: "https://api.deepseek.com",
-    apiKey: process.env.DEEPSEEK_API_KEY
-  })
+  model: openai("gpt-5")
 })
 ```
 
-The adapter targets OpenAI-compatible chat completion APIs, including providers that expose compatible `/chat/completions` endpoints.
+For custom models or providers that expose an OpenAI-compatible chat completions API, use `openAICompatible()`:
+
+```ts
+import { openAICompatible } from "@agent-memory/openai"
+
+const model = openAICompatible({
+  model: "deepseek-chat",
+  baseURL: "https://api.deepseek.com/v1",
+  apiKey: process.env.DEEPSEEK_API_KEY
+})
+```

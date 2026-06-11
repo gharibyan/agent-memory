@@ -24,20 +24,16 @@ Use this when:
 - `@agent-memory/local`: local `.memory/memory.json` persistence.
 - `@agent-memory/sqlite`: real SQLite `.memory/memory.sqlite` persistence.
 - `@agent-memory/postgres`: Postgres persistence with automatic migrations and pgvector retrieval.
-- `@agent-memory/openai`: OpenAI-compatible chat completions, including custom `baseURL` providers.
+- `@agent-memory/openai`: OpenAI chat completions through the official `openai` SDK, including custom `baseURL` providers for compatible endpoints.
 - `agent-memory`: public convenience package. `createAgent({ model })` should work with automatic local memory.
 
 ## Basic Usage
 
 ```ts
-import { createAgent, openAICompatible } from "agent-memory"
+import { createAgent, openai } from "agent-memory"
 
 const agent = createAgent({
-  model: openAICompatible({
-    model: "deepseek-chat",
-    baseURL: "https://api.deepseek.com/v1",
-    apiKey: process.env.DEEPSEEK_API_KEY
-  })
+  model: openai("gpt-5")
 })
 
 const result = await agent.generate({
@@ -58,7 +54,7 @@ const result = await agent.generate({
 
 ## Extending
 
-For a provider adapter, create a package like `@agent-memory/openai` and return a `ModelProvider`.
+For a provider adapter, create a package like `@agent-memory/openai` and return a `ModelProvider`. Major first-party provider packages should depend on the provider's official SDK; OpenAI-compatible wrappers are for custom model endpoints.
 
 For a storage adapter, create a package like `@agent-memory/local` and implement `MemoryStore`. Database adapters should own their migration lifecycle instead of making application code run setup manually.
 

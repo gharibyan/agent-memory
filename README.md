@@ -24,14 +24,10 @@ pnpm pack:check
 ## Quick Start
 
 ```ts
-import { createAgent, openAICompatible } from "agent-memory"
+import { createAgent, openai } from "agent-memory"
 
 const agent = createAgent({
-  model: openAICompatible({
-    model: "deepseek-chat",
-    baseURL: "https://api.deepseek.com/v1",
-    apiKey: process.env.DEEPSEEK_API_KEY
-  })
+  model: openai("gpt-5")
 })
 
 const result = await agent.generate({
@@ -103,6 +99,28 @@ const agent = createAgent({
 
 The Postgres adapter runs migrations automatically before the first memory operation. It creates the pgvector extension by default, version-tracks migrations, creates relational memory tables, and adds an HNSW cosine index for vector search. If your database provider manages extensions separately, install pgvector in the database and pass `createExtension: false`.
 
+## Model Providers
+
+First-party provider integrations should use official SDKs. The OpenAI adapter depends on the official `openai` TypeScript SDK:
+
+```ts
+import { openai } from "agent-memory"
+
+const model = openai("gpt-5")
+```
+
+Use the OpenAI-compatible helper only for custom providers that expose a compatible chat completions API:
+
+```ts
+import { openAICompatible } from "agent-memory"
+
+const model = openAICompatible({
+  model: "deepseek-chat",
+  baseURL: "https://api.deepseek.com/v1",
+  apiKey: process.env.DEEPSEEK_API_KEY
+})
+```
+
 ## Packages
 
 - `agent-memory`: public convenience package with automatic local memory defaults.
@@ -110,7 +128,7 @@ The Postgres adapter runs migrations automatically before the first memory opera
 - `@agent-memory/local`: local JSON persistence adapter.
 - `@agent-memory/sqlite`: real SQLite persistence adapter.
 - `@agent-memory/postgres`: Postgres persistence adapter with pgvector migrations.
-- `@agent-memory/openai`: OpenAI-compatible model adapter.
+- `@agent-memory/openai`: OpenAI official SDK adapter, plus OpenAI-compatible custom endpoint support.
 
 ## Playground
 

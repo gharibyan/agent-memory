@@ -1,7 +1,7 @@
 {
   "name": "@agent-memory/openai",
   "version": "0.0.0",
-  "description": "OpenAI-compatible model provider adapter for agent-memory.",
+  "description": "OpenAI official SDK model provider adapter for agent-memory.",
   "type": "module",
   "author": "Gharibyan",
   "homepage": "https://github.com/gharibyan/agent-memory#readme",
@@ -30,7 +30,8 @@
     "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@agent-memory/core": "workspace:*"
+    "@agent-memory/core": "workspace:*",
+    "openai": "^6.10.0"
   },
   "engines": {
     "node": ">=20.12"
