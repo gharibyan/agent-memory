@@ -4,8 +4,6 @@ TypeScript SDK for building AI agents with automatic, scoped, persistent memory.
 
 `agent-memory` wraps model calls with memory recall and learning so apps can keep useful user, thread, and operation context without manually stuffing long chat histories into every prompt.
 
-Repository: [github.com/gharibyan/agent-memory](https://github.com/gharibyan/agent-memory)
-
 ## Install
 
 ```sh
