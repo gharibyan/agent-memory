@@ -56,6 +56,12 @@ test("publishable packages point to the gharibyan GitHub repository", async () =
   }
 })
 
+test("github codeowners routes repository changes to gharibyan", async () => {
+  const codeowners = await read(".github/CODEOWNERS")
+
+  assert.match(codeowners, /^\* @gharibyan$/m)
+})
+
 test("public repo files do not mention assistant-specific tooling", async () => {
   const files = await listFiles()
   const checked = await Promise.all(files.map(async (file) => [file, await read(file)]))
