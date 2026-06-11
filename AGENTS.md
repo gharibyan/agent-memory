@@ -4,12 +4,12 @@
 
 This repo is a TypeScript-first pnpm workspace for the `agent-memory` SDK.
 
-- `packages/core` (`@agent-memory/core`) is runtime-neutral. Do not add Node `fs`, provider SDKs, or database drivers here.
-- `packages/local` (`@agent-memory/local`) owns local `.memory/memory.json` persistence.
-- `packages/sqlite` (`@agent-memory/sqlite`) owns real SQLite `.memory/memory.sqlite` persistence.
-- `packages/postgres` (`@agent-memory/postgres`) owns Postgres persistence, automatic migrations, and pgvector search.
-- `packages/openai` (`@agent-memory/openai`) owns OpenAI model calls through the official `openai` SDK, plus compatible custom endpoint support.
-- `packages/agent-memory` is the public convenience package. It should keep `createAgent({ model })` easy and automatic.
+- `packages/core` is the private runtime-neutral workspace package. Do not add Node `fs`, provider SDKs, or database drivers here.
+- `packages/local` is the private workspace package for local `.memory/memory.json` persistence.
+- `packages/sqlite` is the private workspace package for real SQLite `.memory/memory.sqlite` persistence.
+- `packages/postgres` is the private workspace package for Postgres persistence, automatic migrations, and pgvector search.
+- `packages/openai` is the private workspace package for OpenAI model calls through the official `openai` SDK, plus compatible custom endpoint support.
+- `packages/agent-memory` is the only public npm package. It should keep `createAgent({ model })` easy and automatic and bundle private workspace package output into `dist/internal`.
 - `apps/playground` is private and must never ship in npm packages.
 
 ## Development Rules
@@ -17,7 +17,7 @@ This repo is a TypeScript-first pnpm workspace for the `agent-memory` SDK.
 - Keep source in TypeScript under `src`; generated output belongs in `dist`.
 - Add tests before changing SDK behavior.
 - Keep package build scripts cleaning `dist` before `tsc` so stale artifacts do not publish.
-- Default memory should be automatic in `agent-memory`, but direct `@agent-memory/core` usage should stay adapter-neutral.
+- Default memory should be automatic in `agent-memory`, but core internals should stay adapter-neutral.
 - Major first-party model provider adapters should use official provider SDKs. Compatibility wrappers are for custom OpenAI-compatible endpoints.
 - Keep `sqliteMemory()` backed by a real SQLite database file, not JSON.
 - Keep `postgresMemory()` responsible for running its own versioned migrations before the first database operation by default.
@@ -33,4 +33,4 @@ pnpm lint
 pnpm pack:check
 ```
 
-Package dry-runs must not include `apps/playground`, `.memory`, `.ai-memory`, generated tarballs, screenshots, logs, or local databases.
+Package dry-runs must only target `agent-memory` and must not include `apps/playground`, `.memory`, `.ai-memory`, generated tarballs, screenshots, logs, or local databases.

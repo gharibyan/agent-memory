@@ -47,7 +47,7 @@ test("source implementation is TypeScript-first", async () => {
   assert.ok(publicSource.some((path) => path.endsWith("index.ts")))
 })
 
-test("package structure separates core runtime, adapters, and public package", async () => {
+test("package structure separates internal runtime, adapters, and public package", async () => {
   const corePackage = await readJson("packages/core/package.json")
   const localPackage = await readJson("packages/local/package.json")
   const openaiPackage = await readJson("packages/openai/package.json")
@@ -57,6 +57,7 @@ test("package structure separates core runtime, adapters, and public package", a
   const publicIndex = await read("packages/agent-memory/src/index.ts")
 
   assert.equal(corePackage.name, "@agent-memory/core")
+  assert.equal(corePackage.private, true)
   assert.equal(corePackage.main, "./dist/index.js")
   assert.equal(corePackage.types, "./dist/index.d.ts")
   assert.deepEqual(corePackage.files, ["dist", "README.md", "package.json"])
@@ -64,11 +65,10 @@ test("package structure separates core runtime, adapters, and public package", a
   assert.equal(publicPackage.name, "agent-memory")
   assert.equal(publicPackage.main, "./dist/index.js")
   assert.equal(publicPackage.types, "./dist/index.d.ts")
-  assert.equal(publicPackage.dependencies["@agent-memory/core"], "workspace:*")
-  assert.equal(publicPackage.dependencies["@agent-memory/local"], "workspace:*")
-  assert.equal(publicPackage.dependencies["@agent-memory/openai"], "workspace:*")
-  assert.equal(publicPackage.dependencies["@agent-memory/postgres"], "workspace:*")
-  assert.equal(publicPackage.dependencies["@agent-memory/sqlite"], "workspace:*")
+  assert.equal(Object.keys(publicPackage.dependencies).some((name) => name.startsWith("@agent-memory/")), false)
+  assert.match(publicPackage.dependencies.openai, /^\^/)
+  assert.match(publicPackage.dependencies.pg, /^\^/)
+  assert.match(publicPackage.dependencies["sql.js"], /^\^/)
   assert.match(publicIndex, /export \* from "@agent-memory\/core"/)
   assert.match(publicIndex, /export \{ localMemory \} from "@agent-memory\/local"/)
   assert.match(publicIndex, /export \{ openAICompatible, openai \} from "@agent-memory\/openai"/)
@@ -76,18 +76,21 @@ test("package structure separates core runtime, adapters, and public package", a
   assert.match(publicIndex, /export \{ sqliteMemory \} from "@agent-memory\/sqlite"/)
 
   assert.equal(localPackage.name, "@agent-memory/local")
+  assert.equal(localPackage.private, true)
   assert.equal(localPackage.main, "./dist/index.js")
   assert.equal(localPackage.types, "./dist/index.d.ts")
   assert.equal(localPackage.dependencies["@agent-memory/core"], "workspace:*")
   assert.deepEqual(localPackage.files, ["dist", "README.md", "package.json"])
 
   assert.equal(openaiPackage.name, "@agent-memory/openai")
+  assert.equal(openaiPackage.private, true)
   assert.equal(openaiPackage.main, "./dist/index.js")
   assert.equal(openaiPackage.types, "./dist/index.d.ts")
   assert.equal(openaiPackage.dependencies["@agent-memory/core"], "workspace:*")
   assert.deepEqual(openaiPackage.files, ["dist", "README.md", "package.json"])
 
   assert.equal(postgresPackage.name, "@agent-memory/postgres")
+  assert.equal(postgresPackage.private, true)
   assert.equal(postgresPackage.main, "./dist/index.js")
   assert.equal(postgresPackage.types, "./dist/index.d.ts")
   assert.equal(postgresPackage.dependencies["@agent-memory/core"], "workspace:*")
@@ -95,6 +98,7 @@ test("package structure separates core runtime, adapters, and public package", a
   assert.deepEqual(postgresPackage.files, ["dist", "README.md", "package.json"])
 
   assert.equal(sqlitePackage.name, "@agent-memory/sqlite")
+  assert.equal(sqlitePackage.private, true)
   assert.equal(sqlitePackage.main, "./dist/index.js")
   assert.equal(sqlitePackage.types, "./dist/index.d.ts")
   assert.equal(sqlitePackage.dependencies["@agent-memory/core"], "workspace:*")
@@ -107,11 +111,7 @@ test("root scripts build TypeScript before test and package checks", async () =>
 
   assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter agent-memory build")
   assert.match(packageJson.scripts.test, /pnpm build/)
-  assert.match(packageJson.scripts["pack:check"], /@agent-memory\/core/)
-  assert.match(packageJson.scripts["pack:check"], /@agent-memory\/local/)
-  assert.match(packageJson.scripts["pack:check"], /@agent-memory\/sqlite/)
-  assert.match(packageJson.scripts["pack:check"], /@agent-memory\/postgres/)
-  assert.match(packageJson.scripts["pack:check"], /@agent-memory\/openai/)
+  assert.equal(packageJson.scripts["pack:check"], "pnpm --filter agent-memory pack --dry-run")
   assert.match(packageJson.devDependencies.typescript, /^\^/)
 })
 

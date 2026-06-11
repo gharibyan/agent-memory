@@ -27,15 +27,13 @@
     "package.json"
   ],
   "scripts": {
-    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json",
+    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json && node ../../scripts/bundle-public-package.mjs",
     "test": "pnpm build && node --test test/*.test.mjs"
   },
   "dependencies": {
-    "@agent-memory/core": "workspace:*",
-    "@agent-memory/local": "workspace:*",
-    "@agent-memory/openai": "workspace:*",
-    "@agent-memory/postgres": "workspace:*",
-    "@agent-memory/sqlite": "workspace:*"
+    "openai": "^6.10.0",
+    "pg": "^8.16.3",
+    "sql.js": "^1.13.0"
   },
   "engines": {
     "node": ">=20.12"

@@ -1,10 +1,9 @@
-# @agent-memory/local
+# packages/local
 
-Local persistent memory adapter for `agent-memory`.
+Private local persistent memory implementation for `agent-memory`.
 
 ```ts
-import { createAgent } from "@agent-memory/core"
-import { localMemory } from "@agent-memory/local"
+import { createAgent, localMemory } from "agent-memory"
 
 const agent = createAgent({
   model,
@@ -12,4 +11,4 @@ const agent = createAgent({
 })
 ```
 
-By default, local memory persists to `.memory/memory.json` in the current working directory. This adapter is meant for local development, prototypes, and single-node apps. Use `@agent-memory/sqlite` when you need a real SQLite database file.
+By default, local memory persists to `.memory/memory.json` in the current working directory. This adapter is meant for local development, prototypes, and single-node apps. Use `sqliteMemory()` from `agent-memory` when you need a real SQLite database file.

@@ -32,21 +32,15 @@ importers:
 
   packages/agent-memory:
     dependencies:
-      '@agent-memory/core':
-        specifier: workspace:*
-        version: link:../core
-      '@agent-memory/local':
-        specifier: workspace:*
-        version: link:../local
-      '@agent-memory/openai':
-        specifier: workspace:*
-        version: link:../openai
-      '@agent-memory/postgres':
-        specifier: workspace:*
-        version: link:../postgres
-      '@agent-memory/sqlite':
-        specifier: workspace:*
-        version: link:../sqlite
+      openai:
+        specifier: ^6.10.0
+        version: 6.42.0
+      pg:
+        specifier: ^8.16.3
+        version: 8.21.0
+      sql.js:
+        specifier: ^1.13.0
+        version: 1.14.1
 
   packages/core: {}
 

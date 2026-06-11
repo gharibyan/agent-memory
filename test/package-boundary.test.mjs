@@ -40,11 +40,11 @@ test("published agent-memory package uses a restrictive files allowlist", async 
   assert.equal(packageJson.files.includes(".ai-memory"), false)
 })
 
-test("published core package uses a restrictive files allowlist", async () => {
+test("internal core package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/core/package.json")
   const distFiles = await listFiles("packages/core/dist")
 
-  assert.equal(packageJson.private, undefined)
+  assert.equal(packageJson.private, true)
   assert.deepEqual(packageJson.files, [
     "dist",
     "README.md",
@@ -56,10 +56,10 @@ test("published core package uses a restrictive files allowlist", async () => {
   assert.equal(distFiles.some((file) => file.includes("local-store")), false)
 })
 
-test("published local adapter package uses a restrictive files allowlist", async () => {
+test("internal local adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/local/package.json")
 
-  assert.equal(packageJson.private, undefined)
+  assert.equal(packageJson.private, true)
   assert.deepEqual(packageJson.files, [
     "dist",
     "README.md",
@@ -70,10 +70,10 @@ test("published local adapter package uses a restrictive files allowlist", async
   assert.equal(packageJson.files.includes(".ai-memory"), false)
 })
 
-test("published sqlite adapter package uses a restrictive files allowlist", async () => {
+test("internal sqlite adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/sqlite/package.json")
 
-  assert.equal(packageJson.private, undefined)
+  assert.equal(packageJson.private, true)
   assert.deepEqual(packageJson.files, [
     "dist",
     "README.md",
@@ -84,10 +84,10 @@ test("published sqlite adapter package uses a restrictive files allowlist", asyn
   assert.equal(packageJson.files.includes(".ai-memory"), false)
 })
 
-test("published postgres adapter package uses a restrictive files allowlist", async () => {
+test("internal postgres adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/postgres/package.json")
 
-  assert.equal(packageJson.private, undefined)
+  assert.equal(packageJson.private, true)
   assert.deepEqual(packageJson.files, [
     "dist",
     "README.md",
@@ -98,10 +98,10 @@ test("published postgres adapter package uses a restrictive files allowlist", as
   assert.equal(packageJson.files.includes(".ai-memory"), false)
 })
 
-test("published openai adapter package uses a restrictive files allowlist", async () => {
+test("internal openai adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/openai/package.json")
 
-  assert.equal(packageJson.private, undefined)
+  assert.equal(packageJson.private, true)
   assert.deepEqual(packageJson.files, [
     "dist",
     "README.md",

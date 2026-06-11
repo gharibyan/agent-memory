@@ -30,6 +30,15 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
+      - name: Validate npm publish token
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is required for npm publishing"
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -45,48 +54,8 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Verify core package contents
-        run: pnpm --filter @agent-memory/core pack --dry-run
-
-      - name: Verify local adapter package contents
-        run: pnpm --filter @agent-memory/local pack --dry-run
-
-      - name: Verify SQLite adapter package contents
-        run: pnpm --filter @agent-memory/sqlite pack --dry-run
-
-      - name: Verify Postgres adapter package contents
-        run: pnpm --filter @agent-memory/postgres pack --dry-run
-
-      - name: Verify OpenAI adapter package contents
-        run: pnpm --filter @agent-memory/openai pack --dry-run
-
       - name: Verify public package contents
         run: pnpm --filter agent-memory pack --dry-run
-
-      - name: Publish core
-        run: pnpm --filter @agent-memory/core publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish local adapter
-        run: pnpm --filter @agent-memory/local publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish SQLite adapter
-        run: pnpm --filter @agent-memory/sqlite publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish Postgres adapter
-        run: pnpm --filter @agent-memory/postgres publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish OpenAI adapter
-        run: pnpm --filter @agent-memory/openai publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish public package
         run: pnpm --filter agent-memory publish --access public --no-git-checks

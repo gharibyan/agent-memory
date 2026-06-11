@@ -101,7 +101,7 @@ The Postgres adapter runs migrations automatically before the first memory opera
 
 ## Model Providers
 
-First-party provider integrations should use official SDKs. The OpenAI adapter depends on the official `openai` TypeScript SDK:
+First-party provider integrations are exported from `agent-memory` and use provider SDKs or documented provider client paths internally. The OpenAI adapter depends on the official `openai` TypeScript SDK:
 
 ```ts
 import { openai } from "agent-memory"
@@ -121,14 +121,19 @@ const model = openAICompatible({
 })
 ```
 
-## Packages
+## Package
 
-- `agent-memory`: public convenience package with automatic local memory defaults.
-- `@agent-memory/core`: runtime-neutral engine, contracts, compiler, retrieval, and in-memory store.
-- `@agent-memory/local`: local JSON persistence adapter.
-- `@agent-memory/sqlite`: real SQLite persistence adapter.
-- `@agent-memory/postgres`: Postgres persistence adapter with pgvector migrations.
-- `@agent-memory/openai`: OpenAI official SDK adapter, plus OpenAI-compatible custom endpoint support.
+`agent-memory` is the only public npm package. It bundles the runtime, storage adapters, and model provider adapters behind one install and one import surface.
+
+The repository still keeps implementation boundaries under `packages/*`:
+
+- `packages/core`: runtime-neutral engine, contracts, compiler, retrieval, and in-memory store.
+- `packages/local`: local JSON persistence adapter.
+- `packages/sqlite`: real SQLite persistence adapter.
+- `packages/postgres`: Postgres persistence adapter with pgvector migrations.
+- `packages/openai`: OpenAI official SDK adapter, plus OpenAI-compatible custom endpoint support.
+
+Those workspace packages are private build units. They are compiled into `agent-memory/dist/internal/*` during the public package build and are not published separately.
 
 ## Playground
 
@@ -147,7 +152,7 @@ pnpm lint
 pnpm pack:check
 ```
 
-Package dry-runs must not include `apps/playground`, `.memory`, local databases, logs, screenshots, or generated tarballs.
+Package dry-runs must only publish the `agent-memory` artifact and must not include `apps/playground`, `.memory`, local databases, logs, screenshots, or generated tarballs.
 
 ## License
 

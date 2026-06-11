@@ -1,5 +1,5 @@
-# @agent-memory/core
+# packages/core
 
-Core provider-neutral runtime for `agent-memory`.
+Private provider-neutral runtime implementation for `agent-memory`.
 
 Most users should install and import from `agent-memory`.

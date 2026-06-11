@@ -1,6 +1,7 @@
 {
   "name": "@agent-memory/postgres",
   "version": "0.0.0",
+  "private": true,
   "description": "Postgres and pgvector persistent memory adapter for agent-memory.",
   "type": "module",
   "author": "Gharibyan",
