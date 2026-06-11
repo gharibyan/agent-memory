@@ -24,15 +24,8 @@ test("github ci runs lint, tests, and package boundary check", async () => {
   assert.match(workflow, /pnpm build/)
   assert.match(workflow, /pnpm test/)
   assert.match(workflow, /pnpm lint/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/core pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/local pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/sqlite pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/postgres pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/openai pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/anthropic pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/gemini pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/xai pack --dry-run/)
   assert.match(workflow, /pnpm --filter agent-memory pack --dry-run/)
+  assert.doesNotMatch(workflow, /pnpm --filter @agent-memory\/.* pack --dry-run/)
 })
 
 test("github publish workflow is tag gated and syncs package version from tag", async () => {
@@ -46,15 +39,9 @@ test("github publish workflow is tag gated and syncs package version from tag", 
   assert.match(workflow, /NPM_TOKEN secret is required for npm publishing/)
   assert.match(workflow, /scripts\/sync-package-version-from-tag\.mjs/)
   assert.match(workflow, /pnpm build/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/core publish --access public --no-git-checks/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/local publish --access public --no-git-checks/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/sqlite publish --access public --no-git-checks/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/postgres publish --access public --no-git-checks/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/openai publish --access public --no-git-checks/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/anthropic publish --access public --no-git-checks/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/gemini publish --access public --no-git-checks/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/xai publish --access public --no-git-checks/)
+  assert.match(workflow, /pnpm --filter agent-memory pack --dry-run/)
   assert.match(workflow, /pnpm --filter agent-memory publish --access public --no-git-checks/)
+  assert.doesNotMatch(workflow, /pnpm --filter @agent-memory\/.* publish --access public --no-git-checks/)
 })
 
 test("root package exposes lint and version sync scripts", async () => {
@@ -104,34 +91,42 @@ test("version sync script updates the publishable package from a v-prefixed tag"
     }, null, 2))
     await writeFile(join(anthropicPackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/anthropic",
+      private: true,
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(corePackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/core",
+      private: true,
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(geminiPackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/gemini",
+      private: true,
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(localPackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/local",
+      private: true,
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(openaiPackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/openai",
+      private: true,
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(postgresPackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/postgres",
+      private: true,
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(sqlitePackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/sqlite",
+      private: true,
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(xaiPackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/xai",
+      private: true,
       version: "0.0.0"
     }, null, 2))
 
@@ -151,25 +146,17 @@ test("version sync script updates the publishable package from a v-prefixed tag"
 
     assert.equal(result.version, "1.2.3")
     assert.deepEqual(result.updatedPackagePaths.sort(), [
-      "packages/agent-memory/package.json",
-      "packages/anthropic/package.json",
-      "packages/core/package.json",
-      "packages/gemini/package.json",
-      "packages/local/package.json",
-      "packages/openai/package.json",
-      "packages/postgres/package.json",
-      "packages/sqlite/package.json",
-      "packages/xai/package.json"
-    ].sort())
+      "packages/agent-memory/package.json"
+    ])
     assert.equal(packageJson.version, "1.2.3")
-    assert.equal(anthropicPackageJson.version, "1.2.3")
-    assert.equal(corePackageJson.version, "1.2.3")
-    assert.equal(geminiPackageJson.version, "1.2.3")
-    assert.equal(localPackageJson.version, "1.2.3")
-    assert.equal(openaiPackageJson.version, "1.2.3")
-    assert.equal(postgresPackageJson.version, "1.2.3")
-    assert.equal(sqlitePackageJson.version, "1.2.3")
-    assert.equal(xaiPackageJson.version, "1.2.3")
+    assert.equal(anthropicPackageJson.version, "0.0.0")
+    assert.equal(corePackageJson.version, "0.0.0")
+    assert.equal(geminiPackageJson.version, "0.0.0")
+    assert.equal(localPackageJson.version, "0.0.0")
+    assert.equal(openaiPackageJson.version, "0.0.0")
+    assert.equal(postgresPackageJson.version, "0.0.0")
+    assert.equal(sqlitePackageJson.version, "0.0.0")
+    assert.equal(xaiPackageJson.version, "0.0.0")
   } finally {
     await rm(tempDir, { recursive: true, force: true })
   }

@@ -27,18 +27,15 @@
     "package.json"
   ],
   "scripts": {
-    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json",
+    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json && node ../../scripts/bundle-public-package.mjs",
     "test": "pnpm build && node --test test/*.test.mjs"
   },
   "dependencies": {
-    "@agent-memory/anthropic": "workspace:*",
-    "@agent-memory/core": "workspace:*",
-    "@agent-memory/gemini": "workspace:*",
-    "@agent-memory/local": "workspace:*",
-    "@agent-memory/openai": "workspace:*",
-    "@agent-memory/postgres": "workspace:*",
-    "@agent-memory/sqlite": "workspace:*",
-    "@agent-memory/xai": "workspace:*"
+    "@anthropic-ai/sdk": "^0.104.1",
+    "@google/genai": "^2.8.0",
+    "openai": "^6.10.0",
+    "pg": "^8.16.3",
+    "sql.js": "^1.13.0"
   },
   "engines": {
     "node": ">=20.12"

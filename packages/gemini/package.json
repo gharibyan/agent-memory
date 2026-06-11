@@ -1,6 +1,7 @@
 {
   "name": "@agent-memory/gemini",
   "version": "0.0.0",
+  "private": true,
   "description": "Google Gemini official SDK model provider adapter for agent-memory.",
   "type": "module",
   "author": "Gharibyan",

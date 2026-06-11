@@ -20,15 +20,15 @@ Use this when:
 
 ## Package Boundaries
 
-- `@agent-memory/core`: runtime-neutral engine, contracts, compiler, retrieval, in-memory store. No Node `fs`, provider SDKs, or database drivers.
-- `@agent-memory/local`: local `.memory/memory.json` persistence.
-- `@agent-memory/sqlite`: real SQLite `.memory/memory.sqlite` persistence.
-- `@agent-memory/postgres`: Postgres persistence with automatic migrations and pgvector retrieval.
-- `@agent-memory/openai`: OpenAI chat completions through the official `openai` SDK, including custom `baseURL` providers for compatible endpoints.
-- `@agent-memory/anthropic`: Anthropic messages through the official `@anthropic-ai/sdk` package.
-- `@agent-memory/gemini`: Gemini generation through the official `@google/genai` package.
-- `@agent-memory/xai`: xAI chat completions through the documented OpenAI SDK-compatible client path with xAI defaults.
-- `agent-memory`: public convenience package. `createAgent({ model })` should work with automatic local memory.
+- `packages/core`: private runtime-neutral engine, contracts, compiler, retrieval, in-memory store. No Node `fs`, provider SDKs, or database drivers.
+- `packages/local`: private local `.memory/memory.json` persistence.
+- `packages/sqlite`: private real SQLite `.memory/memory.sqlite` persistence.
+- `packages/postgres`: private Postgres persistence with automatic migrations and pgvector retrieval.
+- `packages/openai`: private OpenAI chat completions through the official `openai` SDK, including custom `baseURL` providers for compatible endpoints.
+- `packages/anthropic`: private Anthropic messages through the official `@anthropic-ai/sdk` package.
+- `packages/gemini`: private Gemini generation through the official `@google/genai` package.
+- `packages/xai`: private xAI chat completions through the documented OpenAI SDK-compatible client path with xAI defaults.
+- `agent-memory`: the only public npm package. `createAgent({ model })` should work with automatic local memory and should bundle private workspace package output into `dist/internal`.
 
 ## Basic Usage
 
@@ -57,9 +57,9 @@ const result = await agent.generate({
 
 ## Extending
 
-For a provider adapter, create a package like `@agent-memory/openai` and return a `ModelProvider`. Major first-party provider packages should depend on the provider's official SDK when one exists; OpenAI-compatible wrappers are for custom model endpoints and documented compatible providers.
+For a provider adapter, add or extend a private workspace package under `packages/*` and return a `ModelProvider`. Major first-party provider packages should depend on the provider's official SDK when one exists; OpenAI-compatible wrappers are for custom model endpoints and documented compatible providers.
 
-For a storage adapter, create a package like `@agent-memory/local` and implement `MemoryStore`. Database adapters should own their migration lifecycle instead of making application code run setup manually.
+For a storage adapter, add or extend a private workspace package under `packages/*` and implement `MemoryStore`. Database adapters should own their migration lifecycle instead of making application code run setup manually.
 
 Keep core dependency-free and runtime-neutral.
 

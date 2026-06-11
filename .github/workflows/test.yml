@@ -41,29 +41,5 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Verify core package contents
-        run: pnpm --filter @agent-memory/core pack --dry-run
-
-      - name: Verify local adapter package contents
-        run: pnpm --filter @agent-memory/local pack --dry-run
-
-      - name: Verify SQLite adapter package contents
-        run: pnpm --filter @agent-memory/sqlite pack --dry-run
-
-      - name: Verify Postgres adapter package contents
-        run: pnpm --filter @agent-memory/postgres pack --dry-run
-
-      - name: Verify OpenAI adapter package contents
-        run: pnpm --filter @agent-memory/openai pack --dry-run
-
-      - name: Verify Anthropic adapter package contents
-        run: pnpm --filter @agent-memory/anthropic pack --dry-run
-
-      - name: Verify Gemini adapter package contents
-        run: pnpm --filter @agent-memory/gemini pack --dry-run
-
-      - name: Verify xAI adapter package contents
-        run: pnpm --filter @agent-memory/xai pack --dry-run
-
       - name: Verify public package contents
         run: pnpm --filter agent-memory pack --dry-run

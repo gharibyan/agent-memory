@@ -1,6 +1,7 @@
 {
   "name": "@agent-memory/xai",
   "version": "0.0.0",
+  "private": true,
   "description": "xAI model provider adapter for agent-memory using the documented OpenAI SDK path.",
   "type": "module",
   "author": "Gharibyan",

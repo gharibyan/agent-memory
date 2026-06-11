@@ -38,30 +38,21 @@ importers:
 
   packages/agent-memory:
     dependencies:
-      '@agent-memory/anthropic':
-        specifier: workspace:*
-        version: link:../anthropic
-      '@agent-memory/core':
-        specifier: workspace:*
-        version: link:../core
-      '@agent-memory/gemini':
-        specifier: workspace:*
-        version: link:../gemini
-      '@agent-memory/local':
-        specifier: workspace:*
-        version: link:../local
-      '@agent-memory/openai':
-        specifier: workspace:*
-        version: link:../openai
-      '@agent-memory/postgres':
-        specifier: workspace:*
-        version: link:../postgres
-      '@agent-memory/sqlite':
-        specifier: workspace:*
-        version: link:../sqlite
-      '@agent-memory/xai':
-        specifier: workspace:*
-        version: link:../xai
+      '@anthropic-ai/sdk':
+        specifier: ^0.104.1
+        version: 0.104.1
+      '@google/genai':
+        specifier: ^2.8.0
+        version: 2.8.0
+      openai:
+        specifier: ^6.10.0
+        version: 6.42.0(ws@8.21.0)
+      pg:
+        specifier: ^8.16.3
+        version: 8.21.0
+      sql.js:
+        specifier: ^1.13.0
+        version: 1.14.1
 
   packages/anthropic:
     dependencies:

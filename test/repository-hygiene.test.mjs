@@ -36,7 +36,7 @@ test("root README and MIT license are present", async () => {
   assert.match(license, /Gharibyan/)
 })
 
-test("publishable packages point to the gharibyan GitHub repository", async () => {
+test("workspace packages point to the gharibyan GitHub repository", async () => {
   for (const path of [
     "package.json",
     "packages/agent-memory/package.json",

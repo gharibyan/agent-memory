@@ -1,10 +1,9 @@
-# @agent-memory/postgres
+# packages/postgres
 
-Postgres persistence adapter for `agent-memory` with automatic migrations and pgvector retrieval.
+Private Postgres persistence implementation for `agent-memory` with automatic migrations and pgvector retrieval.
 
 ```ts
-import { createAgent } from "agent-memory"
-import { postgresMemory } from "@agent-memory/postgres"
+import { createAgent, postgresMemory } from "agent-memory"
 
 const agent = createAgent({
   model,
