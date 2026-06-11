@@ -22,6 +22,8 @@ async function listFiles(dir = ".") {
     .filter((path) => !path.includes("node_modules"))
     .filter((path) => !path.includes(`${join(".", "dist")}`))
     .filter((path) => !path.includes(`${join(".", ".git")}`))
+    .filter((path) => !path.endsWith(`${join(".", ".env")}`))
+    .filter((path) => !/\.env\.(?!example$)/.test(path))
 }
 
 test("root README and MIT license are present", async () => {
@@ -68,6 +70,10 @@ test("gitignore excludes local IDE project settings", async () => {
   const gitignore = await read(".gitignore")
 
   assert.match(gitignore, /^\.idea\/$/m)
+  assert.match(gitignore, /^\.env$/m)
+  assert.match(gitignore, /^\.env\.\*$/m)
+  assert.match(gitignore, /^!\.env\.example$/m)
+  assert.match(gitignore, /^!apps\/\*\*\/\.env\.example$/m)
 })
 
 test("public repo files do not mention assistant-specific tooling", async () => {

@@ -37,3 +37,20 @@ test("agent-memory skill captures SDK usage and extension patterns", async () =>
   assert.match(content, /official `openai` SDK/)
   assert.match(content, /official SDK/)
 })
+
+test("real OpenAI SQLite demo documents server-side setup", async () => {
+  const readme = await read("apps/openai-sqlite-demo/README.md")
+  const envExample = await read("apps/openai-sqlite-demo/.env.example")
+  const server = await read("apps/openai-sqlite-demo/server.mjs")
+
+  assert.match(readme, /OPENAI_API_KEY/)
+  assert.match(readme, /server-side/)
+  assert.match(readme, /sqliteMemory/)
+  assert.match(envExample, /^OPENAI_API_KEY=$/m)
+  assert.doesNotMatch(envExample, /sk-[A-Za-z0-9]/)
+  assert.match(server, /process\.env\.OPENAI_API_KEY/)
+  assert.match(server, /openai\(/)
+  assert.match(server, /sqliteMemory\(/)
+  assert.match(server, /hasOpenAIKey/)
+  assert.doesNotMatch(server.match(/function page\(\) \{[^]*$/)?.[0] ?? "", /OPENAI_API_KEY/)
+})

@@ -148,13 +148,24 @@ const model = openAICompatible({
 - `@agent-memory/gemini`: Gemini official SDK adapter.
 - `@agent-memory/xai`: xAI adapter using the documented OpenAI SDK-compatible client path.
 
-## Playground
+## Examples
 
 ```sh
 pnpm --filter @agent-memory/playground dev
 ```
 
-The playground is private to the repository and is not included in npm packages.
+The local playground uses an echo model and local JSON memory.
+
+For a real OpenAI call with SQLite memory:
+
+```sh
+cp apps/openai-sqlite-demo/.env.example apps/openai-sqlite-demo/.env
+pnpm --filter @agent-memory/openai-sqlite-demo dev
+```
+
+Set `OPENAI_API_KEY` in `apps/openai-sqlite-demo/.env` or in your server environment. The key stays server-side, and memory persists to `.memory/openai-demo.sqlite` by default.
+
+Both example apps are private to the repository and are not included in npm packages.
 
 ## Development
 
