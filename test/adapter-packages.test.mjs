@@ -32,6 +32,60 @@ test("openai-compatible provider lives in its own publishable adapter package", 
   assert.doesNotMatch(coreIndex, /openai/)
 })
 
+test("anthropic provider lives in its own official SDK adapter package", async () => {
+  const packageJson = await readJson("packages/anthropic/package.json")
+  const source = await read("packages/anthropic/src/index.ts")
+  const coreIndex = await read("packages/core/src/index.ts")
+
+  assert.equal(packageJson.name, "@agent-memory/anthropic")
+  assert.equal(packageJson.main, "./dist/index.js")
+  assert.equal(packageJson.types, "./dist/index.d.ts")
+  assert.deepEqual(packageJson.files, ["dist", "README.md", "package.json"])
+  assert.equal(packageJson.dependencies["@agent-memory/core"], "workspace:*")
+  assert.match(packageJson.dependencies["@anthropic-ai/sdk"], /^\^/)
+  assert.match(source, /from "@anthropic-ai\/sdk"/)
+  assert.match(source, /export function anthropic/)
+  assert.doesNotMatch(source, /fetch\(/)
+  assert.doesNotMatch(coreIndex, /@anthropic-ai\/sdk/)
+  assert.doesNotMatch(coreIndex, /anthropic/)
+})
+
+test("gemini provider lives in its own official SDK adapter package", async () => {
+  const packageJson = await readJson("packages/gemini/package.json")
+  const source = await read("packages/gemini/src/index.ts")
+  const coreIndex = await read("packages/core/src/index.ts")
+
+  assert.equal(packageJson.name, "@agent-memory/gemini")
+  assert.equal(packageJson.main, "./dist/index.js")
+  assert.equal(packageJson.types, "./dist/index.d.ts")
+  assert.deepEqual(packageJson.files, ["dist", "README.md", "package.json"])
+  assert.equal(packageJson.dependencies["@agent-memory/core"], "workspace:*")
+  assert.match(packageJson.dependencies["@google/genai"], /^\^/)
+  assert.match(source, /from "@google\/genai"/)
+  assert.match(source, /export function gemini/)
+  assert.doesNotMatch(source, /fetch\(/)
+  assert.doesNotMatch(coreIndex, /@google\/genai/)
+  assert.doesNotMatch(coreIndex, /gemini/)
+})
+
+test("xai provider lives in its own documented SDK adapter package", async () => {
+  const packageJson = await readJson("packages/xai/package.json")
+  const source = await read("packages/xai/src/index.ts")
+  const coreIndex = await read("packages/core/src/index.ts")
+
+  assert.equal(packageJson.name, "@agent-memory/xai")
+  assert.equal(packageJson.main, "./dist/index.js")
+  assert.equal(packageJson.types, "./dist/index.d.ts")
+  assert.deepEqual(packageJson.files, ["dist", "README.md", "package.json"])
+  assert.equal(packageJson.dependencies["@agent-memory/core"], "workspace:*")
+  assert.match(packageJson.dependencies.openai, /^\^/)
+  assert.match(source, /from "openai"/)
+  assert.match(source, /https:\/\/api\.x\.ai\/v1/)
+  assert.match(source, /export function xai/)
+  assert.doesNotMatch(source, /fetch\(/)
+  assert.doesNotMatch(coreIndex, /xai/)
+})
+
 test("local persistence lives in its own publishable storage adapter package", async () => {
   const packageJson = await readJson("packages/local/package.json")
   const source = await read("packages/local/src/index.ts")
@@ -87,15 +141,21 @@ test("public package re-exports the openai adapter as a convenience import", asy
   const packageJson = await readJson("packages/agent-memory/package.json")
   const source = await read("packages/agent-memory/src/index.ts")
 
+  assert.equal(packageJson.dependencies["@agent-memory/anthropic"], "workspace:*")
+  assert.equal(packageJson.dependencies["@agent-memory/gemini"], "workspace:*")
   assert.equal(packageJson.dependencies["@agent-memory/openai"], "workspace:*")
   assert.equal(packageJson.dependencies["@agent-memory/local"], "workspace:*")
   assert.equal(packageJson.dependencies["@agent-memory/sqlite"], "workspace:*")
   assert.equal(packageJson.dependencies["@agent-memory/postgres"], "workspace:*")
+  assert.equal(packageJson.dependencies["@agent-memory/xai"], "workspace:*")
   assert.match(source, /export \* from "@agent-memory\/core"/)
+  assert.match(source, /export \{ anthropic \} from "@agent-memory\/anthropic"/)
+  assert.match(source, /export \{ gemini \} from "@agent-memory\/gemini"/)
   assert.match(source, /export \{ openAICompatible, openai \} from "@agent-memory\/openai"/)
   assert.match(source, /export \{ localMemory \} from "@agent-memory\/local"/)
   assert.match(source, /export \{ sqliteMemory \} from "@agent-memory\/sqlite"/)
   assert.match(source, /export \{ postgresMemory \} from "@agent-memory\/postgres"/)
+  assert.match(source, /export \{ xai \} from "@agent-memory\/xai"/)
 })
 
 test("built openai adapter exposes OpenAI-compatible provider helpers", async () => {
@@ -134,6 +194,16 @@ test("built postgres adapter exposes pgvector-backed memory helper", async () =>
   const { postgresMemory } = await import("../packages/postgres/dist/index.js")
 
   assert.equal(postgresMemory({ pool: createNoopPool() }).kind, "postgres")
+})
+
+test("built provider adapters expose first-class provider helpers", async () => {
+  const { anthropic } = await import("../packages/anthropic/dist/index.js")
+  const { gemini } = await import("../packages/gemini/dist/index.js")
+  const { xai } = await import("../packages/xai/dist/index.js")
+
+  assert.equal(anthropic("anthropic-model", { apiKey: "test-key" }).id, "anthropic:anthropic-model")
+  assert.equal(gemini("gemini-test", { apiKey: "test-key" }).id, "gemini:gemini-test")
+  assert.equal(xai("grok-test", { apiKey: "test-key" }).id, "xai:grok-test")
 })
 
 function createNoopPool() {

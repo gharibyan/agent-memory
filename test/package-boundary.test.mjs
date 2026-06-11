@@ -70,6 +70,34 @@ test("published local adapter package uses a restrictive files allowlist", async
   assert.equal(packageJson.files.includes(".ai-memory"), false)
 })
 
+test("published anthropic adapter package uses a restrictive files allowlist", async () => {
+  const packageJson = await readJson("packages/anthropic/package.json")
+
+  assert.equal(packageJson.private, undefined)
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "README.md",
+    "package.json"
+  ])
+  assert.equal(packageJson.files.includes("../../apps/playground"), false)
+  assert.equal(packageJson.files.includes(".memory"), false)
+  assert.equal(packageJson.files.includes(".ai-memory"), false)
+})
+
+test("published gemini adapter package uses a restrictive files allowlist", async () => {
+  const packageJson = await readJson("packages/gemini/package.json")
+
+  assert.equal(packageJson.private, undefined)
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "README.md",
+    "package.json"
+  ])
+  assert.equal(packageJson.files.includes("../../apps/playground"), false)
+  assert.equal(packageJson.files.includes(".memory"), false)
+  assert.equal(packageJson.files.includes(".ai-memory"), false)
+})
+
 test("published sqlite adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/sqlite/package.json")
 
@@ -100,6 +128,20 @@ test("published postgres adapter package uses a restrictive files allowlist", as
 
 test("published openai adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/openai/package.json")
+
+  assert.equal(packageJson.private, undefined)
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "README.md",
+    "package.json"
+  ])
+  assert.equal(packageJson.files.includes("../../apps/playground"), false)
+  assert.equal(packageJson.files.includes(".memory"), false)
+  assert.equal(packageJson.files.includes(".ai-memory"), false)
+})
+
+test("published xai adapter package uses a restrictive files allowlist", async () => {
+  const packageJson = await readJson("packages/xai/package.json")
 
   assert.equal(packageJson.private, undefined)
   assert.deepEqual(packageJson.files, [

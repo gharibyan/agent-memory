@@ -1,7 +1,7 @@
 {
-  "name": "agent-memory",
+  "name": "@agent-memory/gemini",
   "version": "0.0.0",
-  "description": "Provider-neutral agent runtime with automatic persistent memory.",
+  "description": "Google Gemini official SDK model provider adapter for agent-memory.",
   "type": "module",
   "author": "Gharibyan",
   "homepage": "https://github.com/gharibyan/agent-memory#readme",
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gharibyan/agent-memory.git",
-    "directory": "packages/agent-memory"
+    "directory": "packages/gemini"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -27,18 +27,11 @@
     "package.json"
   ],
   "scripts": {
-    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json",
-    "test": "pnpm build && node --test test/*.test.mjs"
+    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@agent-memory/anthropic": "workspace:*",
     "@agent-memory/core": "workspace:*",
-    "@agent-memory/gemini": "workspace:*",
-    "@agent-memory/local": "workspace:*",
-    "@agent-memory/openai": "workspace:*",
-    "@agent-memory/postgres": "workspace:*",
-    "@agent-memory/sqlite": "workspace:*",
-    "@agent-memory/xai": "workspace:*"
+    "@google/genai": "^2.8.0"
   },
   "engines": {
     "node": ">=20.12"
@@ -47,6 +40,8 @@
     "ai",
     "agent",
     "memory",
+    "gemini",
+    "google",
     "llm"
   ],
   "license": "MIT"

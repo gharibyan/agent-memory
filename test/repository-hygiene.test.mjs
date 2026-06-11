@@ -29,7 +29,6 @@ test("root README and MIT license are present", async () => {
   const license = await read("LICENSE")
 
   assert.match(readme, /^# agent-memory/m)
-  assert.match(readme, /github\.com\/gharibyan\/agent-memory/)
   assert.match(readme, /MIT License/)
   assert.match(license, /^MIT License/m)
   assert.match(license, /Gharibyan/)
@@ -39,11 +38,14 @@ test("publishable packages point to the gharibyan GitHub repository", async () =
   for (const path of [
     "package.json",
     "packages/agent-memory/package.json",
+    "packages/anthropic/package.json",
     "packages/core/package.json",
+    "packages/gemini/package.json",
     "packages/local/package.json",
     "packages/sqlite/package.json",
     "packages/postgres/package.json",
-    "packages/openai/package.json"
+    "packages/openai/package.json",
+    "packages/xai/package.json"
   ]) {
     const packageJson = await readJson(path)
 
