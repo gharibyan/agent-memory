@@ -6,6 +6,6 @@
     "dev": "node server.mjs"
   },
   "dependencies": {
-    "agent-memory": "workspace:*"
+    "@agent-memory/sdk": "workspace:*"
   }
 }

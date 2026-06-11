@@ -26,13 +26,13 @@ importers:
 
   apps/openai-sqlite-demo:
     dependencies:
-      agent-memory:
+      '@agent-memory/sdk':
         specifier: workspace:*
         version: link:../../packages/agent-memory
 
   apps/playground:
     dependencies:
-      agent-memory:
+      '@agent-memory/sdk':
         specifier: workspace:*
         version: link:../../packages/agent-memory
 

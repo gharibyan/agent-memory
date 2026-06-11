@@ -30,7 +30,7 @@ test("root README and MIT license are present", async () => {
   const readme = await read("README.md")
   const license = await read("LICENSE")
 
-  assert.match(readme, /^# agent-memory/m)
+  assert.match(readme, /^# @agent-memory\/sdk/m)
   assert.match(readme, /MIT License/)
   assert.match(license, /^MIT License/m)
   assert.match(license, /Gharibyan/)

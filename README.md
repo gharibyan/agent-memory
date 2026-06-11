@@ -1,13 +1,13 @@
-# agent-memory
+# @agent-memory/sdk
 
 TypeScript SDK for building AI agents with automatic, scoped, persistent memory.
 
-`agent-memory` wraps model calls with memory recall and learning so apps can keep useful user, thread, and operation context without manually stuffing long chat histories into every prompt.
+`@agent-memory/sdk` wraps model calls with memory recall and learning so apps can keep useful user, thread, and operation context without manually stuffing long chat histories into every prompt.
 
 ## Install
 
 ```sh
-pnpm add agent-memory
+pnpm add @agent-memory/sdk
 ```
 
 For workspace development:
@@ -22,7 +22,7 @@ pnpm pack:check
 ## Quick Start
 
 ```ts
-import { createAgent, openai } from "agent-memory"
+import { createAgent, openai } from "@agent-memory/sdk"
 
 const agent = createAgent({
   model: openai("gpt-5")
@@ -54,10 +54,10 @@ If `userId` is omitted, memory is stored in the shared default scope. That is us
 
 ## Storage
 
-The public `agent-memory` package defaults to local JSON persistence:
+The public `@agent-memory/sdk` package defaults to local JSON persistence:
 
 ```ts
-import { createAgent, openai } from "agent-memory"
+import { createAgent, openai } from "@agent-memory/sdk"
 
 const agent = createAgent({
   model: openai("gpt-5")
@@ -69,7 +69,7 @@ By default this writes to `.memory/memory.json`.
 For a real SQLite database:
 
 ```ts
-import { createAgent, openai, sqliteMemory } from "agent-memory"
+import { createAgent, openai, sqliteMemory } from "@agent-memory/sdk"
 
 const agent = createAgent({
   model: openai("gpt-5"),
@@ -82,7 +82,7 @@ const agent = createAgent({
 For Postgres with pgvector:
 
 ```ts
-import { createAgent, openai, postgresMemory } from "agent-memory"
+import { createAgent, openai, postgresMemory } from "@agent-memory/sdk"
 
 const agent = createAgent({
   model: openai("gpt-5"),
@@ -99,27 +99,27 @@ The Postgres adapter runs migrations automatically before the first memory opera
 
 ## Model Providers
 
-First-party provider integrations are exported from `agent-memory` and use provider SDKs or documented provider client paths internally. The OpenAI adapter depends on the official `openai` TypeScript SDK:
+First-party provider integrations are exported from `@agent-memory/sdk` and use provider SDKs or documented provider client paths internally. The OpenAI adapter depends on the official `openai` TypeScript SDK:
 
 ```ts
-import { openai } from "agent-memory"
+import { openai } from "@agent-memory/sdk"
 
 const model = openai("gpt-5")
 ```
 
-Anthropic and Gemini are exported by `agent-memory` and use their official SDKs internally:
+Anthropic and Gemini are exported by `@agent-memory/sdk` and use their official SDKs internally:
 
 ```ts
-import { anthropic, gemini } from "agent-memory"
+import { anthropic, gemini } from "@agent-memory/sdk"
 
 const anthropicModel = anthropic("anthropic-model")
 const geminiModel = gemini("gemini-2.5-pro")
 ```
 
-xAI is exported by `agent-memory` too. It uses the documented OpenAI SDK-compatible client path with xAI defaults:
+xAI is exported by `@agent-memory/sdk` too. It uses the documented OpenAI SDK-compatible client path with xAI defaults:
 
 ```ts
-import { xai } from "agent-memory"
+import { xai } from "@agent-memory/sdk"
 
 const model = xai("grok-4")
 ```
@@ -127,7 +127,7 @@ const model = xai("grok-4")
 Use the OpenAI-compatible helper only for custom providers that expose a compatible chat completions API:
 
 ```ts
-import { openAICompatible } from "agent-memory"
+import { openAICompatible } from "@agent-memory/sdk"
 
 const model = openAICompatible({
   model: "deepseek-chat",
@@ -138,7 +138,7 @@ const model = openAICompatible({
 
 ## Package
 
-`agent-memory` is the only public npm package. It bundles the runtime, storage adapters, and model provider adapters behind one install and one import surface.
+`@agent-memory/sdk` is the only public npm package. It bundles the runtime, storage adapters, and model provider adapters behind one install and one import surface.
 
 The repository still keeps implementation boundaries under `packages/*`:
 
@@ -151,7 +151,7 @@ The repository still keeps implementation boundaries under `packages/*`:
 - `packages/gemini`: Gemini official SDK adapter.
 - `packages/xai`: xAI adapter using the documented OpenAI SDK-compatible client path.
 
-Those workspace packages are private build units. They are compiled into `agent-memory/dist/internal/*` during the public package build and are not published separately.
+Those workspace packages are private build units. They are compiled into `packages/agent-memory/dist/internal/*` during the public package build and are not published separately.
 
 ## Examples
 
@@ -181,7 +181,7 @@ pnpm lint
 pnpm pack:check
 ```
 
-Package dry-runs must only publish the `agent-memory` artifact and must not include `apps/playground`, `.memory`, local databases, logs, screenshots, or generated tarballs.
+Package dry-runs must only publish the `@agent-memory/sdk` artifact and must not include `apps/playground`, `.memory`, local databases, logs, screenshots, or generated tarballs.
 
 ## License
 

@@ -74,7 +74,7 @@ test("package structure separates internal runtime, adapters, and public package
   assert.equal(corePackage.types, "./dist/index.d.ts")
   assert.deepEqual(corePackage.files, ["dist", "README.md", "package.json"])
 
-  assert.equal(publicPackage.name, "agent-memory")
+  assert.equal(publicPackage.name, "@agent-memory/sdk")
   assert.equal(publicPackage.main, "./dist/index.js")
   assert.equal(publicPackage.types, "./dist/index.d.ts")
   assert.equal(Object.keys(publicPackage.dependencies).some((name) => name.startsWith("@agent-memory/")), false)
@@ -150,9 +150,9 @@ test("package structure separates internal runtime, adapters, and public package
 test("root scripts build TypeScript before test and package checks", async () => {
   const packageJson = await readJson("package.json")
 
-  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter agent-memory build")
+  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter @agent-memory/sdk build")
   assert.match(packageJson.scripts.test, /pnpm build/)
-  assert.equal(packageJson.scripts["pack:check"], "pnpm --filter agent-memory pack --dry-run")
+  assert.equal(packageJson.scripts["pack:check"], "pnpm --filter @agent-memory/sdk pack --dry-run")
   assert.match(packageJson.devDependencies.typescript, /^\^/)
 })
 
