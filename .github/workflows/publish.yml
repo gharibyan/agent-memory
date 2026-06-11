@@ -30,6 +30,15 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
+      - name: Validate npm publish token
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is required for npm publishing"
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

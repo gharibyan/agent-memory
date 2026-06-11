@@ -42,6 +42,8 @@ test("github publish workflow is tag gated and syncs package version from tag", 
   assert.match(workflow, /'v\*'/)
   assert.match(workflow, /NODE_AUTH_TOKEN/)
   assert.match(workflow, /NPM_TOKEN/)
+  assert.match(workflow, /Validate npm publish token/)
+  assert.match(workflow, /NPM_TOKEN secret is required for npm publishing/)
   assert.match(workflow, /scripts\/sync-package-version-from-tag\.mjs/)
   assert.match(workflow, /pnpm build/)
   assert.match(workflow, /pnpm --filter @agent-memory\/core publish --access public --no-git-checks/)
