@@ -1,9 +1,9 @@
 # packages/sqlite
 
-Private SQLite persistent memory implementation for `@agent-memory/sdk`.
+Private SQLite persistent memory implementation for `agent-memory-sdk`.
 
 ```ts
-import { createAgent, openai, sqliteMemory } from "@agent-memory/sdk"
+import { createAgent, openai, sqliteMemory } from "agent-memory-sdk"
 
 const agent = createAgent({
   model: openai("gpt-5"),

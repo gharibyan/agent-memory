@@ -5,7 +5,7 @@ import {
   createAgent,
   customModel,
   localMemory
-} from "@agent-memory/sdk"
+} from "agent-memory-sdk"
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "../..")
 const port = Number(process.env.PORT ?? 4317)

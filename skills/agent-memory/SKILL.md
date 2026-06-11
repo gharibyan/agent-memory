@@ -7,13 +7,13 @@ description: Use when building, integrating, testing, or extending the agent-mem
 
 ## Overview
 
-`@agent-memory/sdk` is a TypeScript SDK that wraps model calls with automatic scoped memory, compact recall, and pluggable storage/model adapters.
+`agent-memory-sdk` is a TypeScript SDK that wraps model calls with automatic scoped memory, compact recall, and pluggable storage/model adapters.
 
 ## When to Use
 
 Use this when:
 
-- Adding `@agent-memory/sdk` to an app, API route, worker, or service.
+- Adding `agent-memory-sdk` to an app, API route, worker, or service.
 - Extending model providers or storage adapters.
 - Testing memory recall, learning, forget/export, or package boundaries.
 - Debugging prompt bloat or missing context in long-running chats.
@@ -28,12 +28,12 @@ Use this when:
 - `packages/anthropic`: private Anthropic messages through the official `@anthropic-ai/sdk` package.
 - `packages/gemini`: private Gemini generation through the official `@google/genai` package.
 - `packages/xai`: private xAI chat completions through the documented OpenAI SDK-compatible client path with xAI defaults.
-- `@agent-memory/sdk`: the only public npm package. `createAgent({ model })` should work with automatic local memory and should bundle private workspace package output into `dist/internal`.
+- `agent-memory-sdk`: the only public npm package. `createAgent({ model })` should work with automatic local memory and should bundle private workspace package output into `dist/internal`.
 
 ## Basic Usage
 
 ```ts
-import { createAgent, openai } from "@agent-memory/sdk"
+import { createAgent, openai } from "agent-memory-sdk"
 
 const agent = createAgent({
   model: openai("gpt-5")

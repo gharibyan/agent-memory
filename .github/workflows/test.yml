@@ -42,4 +42,4 @@ jobs:
         run: pnpm test
 
       - name: Verify public package contents
-        run: pnpm --filter @agent-memory/sdk pack --dry-run
+        run: pnpm --filter agent-memory-sdk pack --dry-run

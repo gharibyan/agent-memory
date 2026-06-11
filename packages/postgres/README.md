@@ -1,9 +1,9 @@
 # packages/postgres
 
-Private Postgres persistence implementation for `@agent-memory/sdk` with automatic migrations and pgvector retrieval.
+Private Postgres persistence implementation for `agent-memory-sdk` with automatic migrations and pgvector retrieval.
 
 ```ts
-import { createAgent, postgresMemory } from "@agent-memory/sdk"
+import { createAgent, postgresMemory } from "agent-memory-sdk"
 
 const agent = createAgent({
   model,

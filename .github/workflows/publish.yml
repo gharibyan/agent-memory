@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   publish:
-    name: Publish @agent-memory/sdk to npm
+    name: Publish agent-memory-sdk to npm
     runs-on: ubuntu-latest
 
     steps:
@@ -55,9 +55,9 @@ jobs:
         run: pnpm test
 
       - name: Verify public package contents
-        run: pnpm --filter @agent-memory/sdk pack --dry-run
+        run: pnpm --filter agent-memory-sdk pack --dry-run
 
       - name: Publish public package
-        run: pnpm --filter @agent-memory/sdk publish --access public --no-git-checks
+        run: pnpm --filter agent-memory-sdk publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

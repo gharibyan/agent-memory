@@ -25,7 +25,7 @@ test("github ci runs lint, tests, and package boundary check", async () => {
   assert.match(workflow, /pnpm build/)
   assert.match(workflow, /pnpm test/)
   assert.match(workflow, /pnpm lint/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/sdk pack --dry-run/)
+  assert.match(workflow, /pnpm --filter agent-memory-sdk pack --dry-run/)
   assert.doesNotMatch(workflow, new RegExp(`${internalPackageFilterPattern.source} pack --dry-run`))
 })
 
@@ -40,15 +40,15 @@ test("github publish workflow is tag gated and syncs package version from tag", 
   assert.match(workflow, /NPM_TOKEN secret is required for npm publishing/)
   assert.match(workflow, /scripts\/sync-package-version-from-tag\.mjs/)
   assert.match(workflow, /pnpm build/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/sdk pack --dry-run/)
-  assert.match(workflow, /pnpm --filter @agent-memory\/sdk publish --access public --no-git-checks/)
+  assert.match(workflow, /pnpm --filter agent-memory-sdk pack --dry-run/)
+  assert.match(workflow, /pnpm --filter agent-memory-sdk publish --access public --no-git-checks/)
   assert.doesNotMatch(workflow, new RegExp(`${internalPackageFilterPattern.source} publish --access public --no-git-checks`))
 })
 
 test("root package exposes lint and version sync scripts", async () => {
   const packageJson = await readJson("package.json")
 
-  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter @agent-memory/sdk build")
+  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter agent-memory-sdk build")
   assert.equal(packageJson.scripts.lint, "eslint .")
   assert.equal(packageJson.scripts["version:from-tag"], "node scripts/sync-package-version-from-tag.mjs")
 })
@@ -87,7 +87,7 @@ test("version sync script updates the publishable package from a v-prefixed tag"
     await mkdir(sqlitePackageDir, { recursive: true })
     await mkdir(xaiPackageDir, { recursive: true })
     await writeFile(join(publicPackageDir, "package.json"), JSON.stringify({
-      name: "@agent-memory/sdk",
+      name: "agent-memory-sdk",
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(anthropicPackageDir, "package.json"), JSON.stringify({

@@ -40,10 +40,10 @@ async function listFiles(dir) {
     .map((entry) => join(entry.parentPath, entry.name))
 }
 
-test("only @agent-memory/sdk is publishable from the workspace package set", async () => {
+test("only agent-memory-sdk is publishable from the workspace package set", async () => {
   const publicPackage = await readJson("packages/agent-memory/package.json")
 
-  assert.equal(publicPackage.name, "@agent-memory/sdk")
+  assert.equal(publicPackage.name, "agent-memory-sdk")
   assert.equal(publicPackage.private, undefined)
   assert.equal(
     Object.keys(publicPackage.dependencies ?? {}).some((name) => name.startsWith("@agent-memory/")),
@@ -82,15 +82,15 @@ test("agent-memory dist contains bundled first-party internals", async () => {
   )
 })
 
-test("pack and publish automation only target the @agent-memory/sdk npm package", async () => {
+test("pack and publish automation only target the agent-memory-sdk npm package", async () => {
   const packageJson = await readJson("package.json")
   const testWorkflow = await read(".github/workflows/test.yml")
   const publishWorkflow = await read(".github/workflows/publish.yml")
 
-  assert.match(packageJson.scripts["pack:check"], /pnpm --filter @agent-memory\/sdk pack --dry-run/)
+  assert.match(packageJson.scripts["pack:check"], /pnpm --filter agent-memory-sdk pack --dry-run/)
   assert.doesNotMatch(packageJson.scripts["pack:check"], internalPackageFilterPattern)
-  assert.match(testWorkflow, /pnpm --filter @agent-memory\/sdk pack --dry-run/)
+  assert.match(testWorkflow, /pnpm --filter agent-memory-sdk pack --dry-run/)
   assert.doesNotMatch(testWorkflow, internalPackageFilterPattern)
-  assert.match(publishWorkflow, /pnpm --filter @agent-memory\/sdk publish --access public --no-git-checks/)
+  assert.match(publishWorkflow, /pnpm --filter agent-memory-sdk publish --access public --no-git-checks/)
   assert.doesNotMatch(publishWorkflow, /pnpm --filter @agent-memory\/(?:anthropic|core|gemini|local|openai|postgres|sqlite|xai) publish/)
 })

@@ -1,5 +1,5 @@
 # packages/core
 
-Private provider-neutral runtime implementation for `@agent-memory/sdk`.
+Private provider-neutral runtime implementation for `agent-memory-sdk`.
 
-Most users should install and import from `@agent-memory/sdk`.
+Most users should install and import from `agent-memory-sdk`.
