@@ -1,0 +1,10 @@
+node_modules/
+.memory/
+.ai-memory/
+*.log
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+coverage/
+dist/
+.DS_Store

@@ -1,0 +1,49 @@
+{
+  "name": "agent-memory",
+  "version": "0.0.0",
+  "description": "Provider-neutral agent runtime with automatic persistent memory.",
+  "type": "module",
+  "author": "Gharibyan",
+  "homepage": "https://github.com/gharibyan/agent-memory#readme",
+  "bugs": {
+    "url": "https://github.com/gharibyan/agent-memory/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gharibyan/agent-memory.git",
+    "directory": "packages/agent-memory"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json",
+    "test": "pnpm build && node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@agent-memory/core": "workspace:*",
+    "@agent-memory/local": "workspace:*",
+    "@agent-memory/openai": "workspace:*",
+    "@agent-memory/sqlite": "workspace:*"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "memory",
+    "llm"
+  ],
+  "license": "MIT"
+}

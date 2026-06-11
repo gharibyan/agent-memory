@@ -1,0 +1,45 @@
+{
+  "name": "@agent-memory/local",
+  "version": "0.0.0",
+  "description": "Local persistent memory adapter for agent-memory.",
+  "type": "module",
+  "author": "Gharibyan",
+  "homepage": "https://github.com/gharibyan/agent-memory#readme",
+  "bugs": {
+    "url": "https://github.com/gharibyan/agent-memory/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gharibyan/agent-memory.git",
+    "directory": "packages/local"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@agent-memory/core": "workspace:*"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "memory",
+    "local"
+  ],
+  "license": "MIT"
+}

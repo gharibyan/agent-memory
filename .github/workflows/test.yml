@@ -1,0 +1,57 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint, test, and pack check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.12.2
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      - name: Verify core package contents
+        run: pnpm --filter @agent-memory/core pack --dry-run
+
+      - name: Verify local adapter package contents
+        run: pnpm --filter @agent-memory/local pack --dry-run
+
+      - name: Verify SQLite adapter package contents
+        run: pnpm --filter @agent-memory/sqlite pack --dry-run
+
+      - name: Verify OpenAI adapter package contents
+        run: pnpm --filter @agent-memory/openai pack --dry-run
+
+      - name: Verify public package contents
+        run: pnpm --filter agent-memory pack --dry-run

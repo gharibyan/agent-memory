@@ -1,0 +1,36 @@
+{
+  "name": "agent-memory-repo",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript SDK for building AI agents with automatic scoped persistent memory.",
+  "author": "Gharibyan",
+  "license": "MIT",
+  "homepage": "https://github.com/gharibyan/agent-memory#readme",
+  "bugs": {
+    "url": "https://github.com/gharibyan/agent-memory/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gharibyan/agent-memory.git"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/openai build && pnpm --filter agent-memory build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm build && node --test packages/agent-memory/test/*.test.mjs test/*.test.mjs",
+    "pack:check": "pnpm --filter @agent-memory/core pack --dry-run && pnpm --filter @agent-memory/local pack --dry-run && pnpm --filter @agent-memory/sqlite pack --dry-run && pnpm --filter @agent-memory/openai pack --dry-run && pnpm --filter agent-memory pack --dry-run",
+    "version:from-tag": "node scripts/sync-package-version-from-tag.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^20.19.25",
+    "eslint": "^9.39.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1"
+  }
+}

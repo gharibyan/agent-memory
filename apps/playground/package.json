@@ -1,0 +1,11 @@
+{
+  "name": "@agent-memory/playground",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs"
+  },
+  "dependencies": {
+    "agent-memory": "workspace:*"
+  }
+}

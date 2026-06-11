@@ -1,0 +1,71 @@
+import assert from "node:assert/strict"
+import { readdir, readFile } from "node:fs/promises"
+import { join } from "node:path"
+import { test } from "node:test"
+
+const root = new URL("../", import.meta.url)
+const repositoryUrl = "git+https://github.com/gharibyan/agent-memory.git"
+
+async function read(path) {
+  return readFile(new URL(path, root), "utf8")
+}
+
+async function readJson(path) {
+  return JSON.parse(await read(path))
+}
+
+async function listFiles(dir = ".") {
+  const entries = await readdir(new URL(dir, root), { recursive: true, withFileTypes: true })
+  return entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => join(entry.parentPath, entry.name))
+    .filter((path) => !path.includes("node_modules"))
+    .filter((path) => !path.includes(`${join(".", "dist")}`))
+    .filter((path) => !path.includes(`${join(".", ".git")}`))
+}
+
+test("root README and MIT license are present", async () => {
+  const readme = await read("README.md")
+  const license = await read("LICENSE")
+
+  assert.match(readme, /^# agent-memory/m)
+  assert.match(readme, /github\.com\/gharibyan\/agent-memory/)
+  assert.match(readme, /MIT License/)
+  assert.match(license, /^MIT License/m)
+  assert.match(license, /Gharibyan/)
+})
+
+test("publishable packages point to the gharibyan GitHub repository", async () => {
+  for (const path of [
+    "package.json",
+    "packages/agent-memory/package.json",
+    "packages/core/package.json",
+    "packages/local/package.json",
+    "packages/sqlite/package.json",
+    "packages/openai/package.json"
+  ]) {
+    const packageJson = await readJson(path)
+
+    assert.equal(packageJson.author, "Gharibyan")
+    assert.equal(packageJson.license, "MIT")
+    assert.equal(packageJson.repository.type, "git")
+    assert.equal(packageJson.repository.url, repositoryUrl)
+    assert.equal(packageJson.bugs.url, "https://github.com/gharibyan/agent-memory/issues")
+    assert.equal(packageJson.homepage, "https://github.com/gharibyan/agent-memory#readme")
+  }
+})
+
+test("public repo files do not mention assistant-specific tooling", async () => {
+  const files = await listFiles()
+  const checked = await Promise.all(files.map(async (file) => [file, await read(file)]))
+  const blocked = [
+    new RegExp("co" + "dex", "i"),
+    new RegExp("clau" + "de", "i")
+  ]
+
+  for (const [file, content] of checked) {
+    for (const pattern of blocked) {
+      assert.doesNotMatch(content, pattern, file)
+    }
+  }
+})

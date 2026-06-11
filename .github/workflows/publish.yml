@@ -1,0 +1,86 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish agent-memory to npm
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.12.2
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync package version from tag
+        run: node scripts/sync-package-version-from-tag.mjs "$GITHUB_REF_NAME"
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      - name: Verify core package contents
+        run: pnpm --filter @agent-memory/core pack --dry-run
+
+      - name: Verify local adapter package contents
+        run: pnpm --filter @agent-memory/local pack --dry-run
+
+      - name: Verify SQLite adapter package contents
+        run: pnpm --filter @agent-memory/sqlite pack --dry-run
+
+      - name: Verify OpenAI adapter package contents
+        run: pnpm --filter @agent-memory/openai pack --dry-run
+
+      - name: Verify public package contents
+        run: pnpm --filter agent-memory pack --dry-run
+
+      - name: Publish core
+        run: pnpm --filter @agent-memory/core publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish local adapter
+        run: pnpm --filter @agent-memory/local publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish SQLite adapter
+        run: pnpm --filter @agent-memory/sqlite publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish OpenAI adapter
+        run: pnpm --filter @agent-memory/openai publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish public package
+        run: pnpm --filter agent-memory publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
