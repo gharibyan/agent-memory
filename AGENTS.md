@@ -9,6 +9,9 @@ This repo is a TypeScript-first pnpm workspace for the `agent-memory` SDK.
 - `packages/sqlite` is the private workspace package for real SQLite `.memory/memory.sqlite` persistence.
 - `packages/postgres` is the private workspace package for Postgres persistence, automatic migrations, and pgvector search.
 - `packages/openai` is the private workspace package for OpenAI model calls through the official `openai` SDK, plus compatible custom endpoint support.
+- `packages/anthropic` is the private workspace package for Anthropic model calls through the official `@anthropic-ai/sdk` package.
+- `packages/gemini` is the private workspace package for Gemini model calls through the official `@google/genai` package.
+- `packages/xai` is the private workspace package for xAI model calls through the documented OpenAI SDK-compatible client path with xAI defaults.
 - `packages/agent-memory` is the only public npm package. It should keep `createAgent({ model })` easy and automatic and bundle private workspace package output into `dist/internal`.
 - `apps/playground` is private and must never ship in npm packages.
 

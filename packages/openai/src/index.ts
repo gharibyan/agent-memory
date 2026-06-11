@@ -29,6 +29,7 @@ export function openai(
 
   return createOpenAIChatProvider({
     idPrefix: "openai",
+    tokenParameter: "max_completion_tokens",
     apiKey: process.env.OPENAI_API_KEY,
     ...config
   })
@@ -37,11 +38,14 @@ export function openai(
 export function openAICompatible(config: OpenAICompatibleOptions): ModelProvider {
   return createOpenAIChatProvider({
     idPrefix: "openai-compatible",
+    tokenParameter: "max_tokens",
     ...config
   })
 }
 
-function createOpenAIChatProvider(config: OpenAICompatibleOptions & { idPrefix: string }): ModelProvider {
+function createOpenAIChatProvider(
+  config: OpenAICompatibleOptions & { idPrefix: string; tokenParameter: TokenParameter }
+): ModelProvider {
   if (!config.model) {
     throw new Error(`${config.idPrefix} provider requires a model`)
   }
@@ -67,7 +71,7 @@ function createOpenAIChatProvider(config: OpenAICompatibleOptions & { idPrefix: 
       jsonSchema: true
     },
     async generate(request: ModelRequest): Promise<ModelResponse> {
-      const completion = await sdk().chat.completions.create(chatCompletionInput(config.model, request, false))
+      const completion = await sdk().chat.completions.create(chatCompletionInput(config, request, false))
       const json = completion as OpenAIChatCompletion
       const choice = json.choices?.[0]
       return {
@@ -80,7 +84,7 @@ function createOpenAIChatProvider(config: OpenAICompatibleOptions & { idPrefix: 
       }
     },
     async *stream(request: ModelRequest): AsyncIterable<ModelStreamChunk> {
-      const stream = await sdk().chat.completions.create(chatCompletionInput(config.model, request, true))
+      const stream = await sdk().chat.completions.create(chatCompletionInput(config, request, true))
 
       for await (const chunk of stream as AsyncIterable<OpenAIChatCompletionChunk>) {
         const text = chunk.choices?.[0]?.delta?.content
@@ -90,15 +94,26 @@ function createOpenAIChatProvider(config: OpenAICompatibleOptions & { idPrefix: 
   })
 }
 
-function chatCompletionInput(model: string, request: ModelRequest, stream: boolean): ChatCompletionInput {
+function chatCompletionInput(
+  config: OpenAICompatibleOptions & { tokenParameter: TokenParameter },
+  request: ModelRequest,
+  stream: boolean
+): ChatCompletionInput {
   return {
-    model,
+    model: config.model,
     messages: request.messages.map(openAIMessage),
     ...(request.tools ? { tools: request.tools } : {}),
     ...(request.temperature === undefined ? {} : { temperature: request.temperature }),
-    ...(request.maxTokens === undefined ? {} : { max_tokens: request.maxTokens }),
+    ...tokenLimit(config.tokenParameter, request.maxTokens),
     stream
   }
+}
+
+function tokenLimit(parameter: TokenParameter, maxTokens: number | undefined): Partial<ChatCompletionInput> {
+  if (maxTokens === undefined) return {}
+  return parameter === "max_completion_tokens"
+    ? { max_completion_tokens: maxTokens }
+    : { max_tokens: maxTokens }
 }
 
 function openAIMessage(message: AgentMessage): Record<string, unknown> {
@@ -146,5 +161,8 @@ type ChatCompletionInput = {
   tools?: unknown[]
   temperature?: number
   max_tokens?: number
+  max_completion_tokens?: number
   stream: boolean
 }
+
+type TokenParameter = "max_tokens" | "max_completion_tokens"

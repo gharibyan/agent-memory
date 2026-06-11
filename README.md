@@ -4,8 +4,6 @@ TypeScript SDK for building AI agents with automatic, scoped, persistent memory.
 
 `agent-memory` wraps model calls with memory recall and learning so apps can keep useful user, thread, and operation context without manually stuffing long chat histories into every prompt.
 
-Repository: [github.com/gharibyan/agent-memory](https://github.com/gharibyan/agent-memory)
-
 ## Install
 
 ```sh
@@ -109,6 +107,23 @@ import { openai } from "agent-memory"
 const model = openai("gpt-5")
 ```
 
+Anthropic and Gemini are exported by `agent-memory` and use their official SDKs internally:
+
+```ts
+import { anthropic, gemini } from "agent-memory"
+
+const anthropicModel = anthropic("anthropic-model")
+const geminiModel = gemini("gemini-2.5-pro")
+```
+
+xAI is exported by `agent-memory` too. It uses the documented OpenAI SDK-compatible client path with xAI defaults:
+
+```ts
+import { xai } from "agent-memory"
+
+const model = xai("grok-4")
+```
+
 Use the OpenAI-compatible helper only for custom providers that expose a compatible chat completions API:
 
 ```ts
@@ -132,16 +147,30 @@ The repository still keeps implementation boundaries under `packages/*`:
 - `packages/sqlite`: real SQLite persistence adapter.
 - `packages/postgres`: Postgres persistence adapter with pgvector migrations.
 - `packages/openai`: OpenAI official SDK adapter, plus OpenAI-compatible custom endpoint support.
+- `packages/anthropic`: Anthropic official SDK adapter.
+- `packages/gemini`: Gemini official SDK adapter.
+- `packages/xai`: xAI adapter using the documented OpenAI SDK-compatible client path.
 
 Those workspace packages are private build units. They are compiled into `agent-memory/dist/internal/*` during the public package build and are not published separately.
 
-## Playground
+## Examples
 
 ```sh
 pnpm --filter @agent-memory/playground dev
 ```
 
-The playground is private to the repository and is not included in npm packages.
+The local playground uses an echo model and local JSON memory.
+
+For a real OpenAI call with SQLite memory:
+
+```sh
+cp apps/openai-sqlite-demo/.env.example apps/openai-sqlite-demo/.env
+pnpm --filter @agent-memory/openai-sqlite-demo dev
+```
+
+Set `OPENAI_API_KEY` in `apps/openai-sqlite-demo/.env` or in your server environment. The key stays server-side, and memory persists to `.memory/openai-demo.sqlite` by default.
+
+Both example apps are private to the repository and are not included in npm packages.
 
 ## Development
 

@@ -5,11 +5,14 @@ import { test } from "node:test"
 
 const root = new URL("../", import.meta.url)
 const internalPackageDirs = [
+  "anthropic",
   "core",
+  "gemini",
   "local",
   "openai",
   "postgres",
-  "sqlite"
+  "sqlite",
+  "xai"
 ]
 
 async function exists(path) {

@@ -22,6 +22,8 @@ async function listFiles(dir = ".") {
     .filter((path) => !path.includes("node_modules"))
     .filter((path) => !path.includes(`${join(".", "dist")}`))
     .filter((path) => !path.includes(`${join(".", ".git")}`))
+    .filter((path) => !path.endsWith(`${join(".", ".env")}`))
+    .filter((path) => !/\.env\.(?!example$)/.test(path))
 }
 
 test("root README and MIT license are present", async () => {
@@ -29,7 +31,6 @@ test("root README and MIT license are present", async () => {
   const license = await read("LICENSE")
 
   assert.match(readme, /^# agent-memory/m)
-  assert.match(readme, /github\.com\/gharibyan\/agent-memory/)
   assert.match(readme, /MIT License/)
   assert.match(license, /^MIT License/m)
   assert.match(license, /Gharibyan/)
@@ -39,11 +40,14 @@ test("workspace packages point to the gharibyan GitHub repository", async () => 
   for (const path of [
     "package.json",
     "packages/agent-memory/package.json",
+    "packages/anthropic/package.json",
     "packages/core/package.json",
+    "packages/gemini/package.json",
     "packages/local/package.json",
     "packages/sqlite/package.json",
     "packages/postgres/package.json",
-    "packages/openai/package.json"
+    "packages/openai/package.json",
+    "packages/xai/package.json"
   ]) {
     const packageJson = await readJson(path)
 
@@ -66,6 +70,10 @@ test("gitignore excludes local IDE project settings", async () => {
   const gitignore = await read(".gitignore")
 
   assert.match(gitignore, /^\.idea\/$/m)
+  assert.match(gitignore, /^\.env$/m)
+  assert.match(gitignore, /^\.env\.\*$/m)
+  assert.match(gitignore, /^!\.env\.example$/m)
+  assert.match(gitignore, /^!apps\/\*\*\/\.env\.example$/m)
 })
 
 test("public repo files do not mention assistant-specific tooling", async () => {

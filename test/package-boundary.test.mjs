@@ -21,9 +21,11 @@ async function listFiles(dir) {
 test("root and playground packages are private", async () => {
   const rootPackage = await readJson("package.json")
   const playgroundPackage = await readJson("apps/playground/package.json")
+  const openAISqliteDemoPackage = await readJson("apps/openai-sqlite-demo/package.json")
 
   assert.equal(rootPackage.private, true)
   assert.equal(playgroundPackage.private, true)
+  assert.equal(openAISqliteDemoPackage.private, true)
 })
 
 test("published agent-memory package uses a restrictive files allowlist", async () => {
@@ -70,6 +72,34 @@ test("internal local adapter package uses a restrictive files allowlist", async 
   assert.equal(packageJson.files.includes(".ai-memory"), false)
 })
 
+test("internal anthropic adapter package uses a restrictive files allowlist", async () => {
+  const packageJson = await readJson("packages/anthropic/package.json")
+
+  assert.equal(packageJson.private, true)
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "README.md",
+    "package.json"
+  ])
+  assert.equal(packageJson.files.includes("../../apps/playground"), false)
+  assert.equal(packageJson.files.includes(".memory"), false)
+  assert.equal(packageJson.files.includes(".ai-memory"), false)
+})
+
+test("internal gemini adapter package uses a restrictive files allowlist", async () => {
+  const packageJson = await readJson("packages/gemini/package.json")
+
+  assert.equal(packageJson.private, true)
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "README.md",
+    "package.json"
+  ])
+  assert.equal(packageJson.files.includes("../../apps/playground"), false)
+  assert.equal(packageJson.files.includes(".memory"), false)
+  assert.equal(packageJson.files.includes(".ai-memory"), false)
+})
+
 test("internal sqlite adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/sqlite/package.json")
 
@@ -100,6 +130,20 @@ test("internal postgres adapter package uses a restrictive files allowlist", asy
 
 test("internal openai adapter package uses a restrictive files allowlist", async () => {
   const packageJson = await readJson("packages/openai/package.json")
+
+  assert.equal(packageJson.private, true)
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "README.md",
+    "package.json"
+  ])
+  assert.equal(packageJson.files.includes("../../apps/playground"), false)
+  assert.equal(packageJson.files.includes(".memory"), false)
+  assert.equal(packageJson.files.includes(".ai-memory"), false)
+})
+
+test("internal xai adapter package uses a restrictive files allowlist", async () => {
+  const packageJson = await readJson("packages/xai/package.json")
 
   assert.equal(packageJson.private, true)
   assert.deepEqual(packageJson.files, [

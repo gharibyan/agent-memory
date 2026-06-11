@@ -25,6 +25,9 @@ Use this when:
 - `packages/sqlite`: private real SQLite `.memory/memory.sqlite` persistence.
 - `packages/postgres`: private Postgres persistence with automatic migrations and pgvector retrieval.
 - `packages/openai`: private OpenAI chat completions through the official `openai` SDK, including custom `baseURL` providers for compatible endpoints.
+- `packages/anthropic`: private Anthropic messages through the official `@anthropic-ai/sdk` package.
+- `packages/gemini`: private Gemini generation through the official `@google/genai` package.
+- `packages/xai`: private xAI chat completions through the documented OpenAI SDK-compatible client path with xAI defaults.
 - `agent-memory`: the only public npm package. `createAgent({ model })` should work with automatic local memory and should bundle private workspace package output into `dist/internal`.
 
 ## Basic Usage

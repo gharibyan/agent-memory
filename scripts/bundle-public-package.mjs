@@ -3,11 +3,14 @@ import { dirname, relative, resolve, sep } from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
 
 const firstPartyPackages = [
+  { dir: "anthropic", name: "@agent-memory/anthropic" },
   { dir: "core", name: "@agent-memory/core" },
+  { dir: "gemini", name: "@agent-memory/gemini" },
   { dir: "local", name: "@agent-memory/local" },
   { dir: "openai", name: "@agent-memory/openai" },
   { dir: "postgres", name: "@agent-memory/postgres" },
-  { dir: "sqlite", name: "@agent-memory/sqlite" }
+  { dir: "sqlite", name: "@agent-memory/sqlite" },
+  { dir: "xai", name: "@agent-memory/xai" }
 ]
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..")

@@ -5,11 +5,14 @@
     "rootDir": "src",
     "outDir": "dist",
     "paths": {
+      "@agent-memory/anthropic": ["packages/anthropic/dist/index.d.ts"],
       "@agent-memory/core": ["packages/core/dist/index.d.ts"],
+      "@agent-memory/gemini": ["packages/gemini/dist/index.d.ts"],
       "@agent-memory/local": ["packages/local/dist/index.d.ts"],
       "@agent-memory/openai": ["packages/openai/dist/index.d.ts"],
       "@agent-memory/postgres": ["packages/postgres/dist/index.d.ts"],
-      "@agent-memory/sqlite": ["packages/sqlite/dist/index.d.ts"]
+      "@agent-memory/sqlite": ["packages/sqlite/dist/index.d.ts"],
+      "@agent-memory/xai": ["packages/xai/dist/index.d.ts"]
     },
     "tsBuildInfoFile": "dist/.tsbuildinfo"
   },

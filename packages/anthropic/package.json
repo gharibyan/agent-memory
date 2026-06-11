@@ -1,7 +1,8 @@
 {
-  "name": "agent-memory",
+  "name": "@agent-memory/anthropic",
   "version": "0.0.0",
-  "description": "Provider-neutral agent runtime with automatic persistent memory.",
+  "private": true,
+  "description": "Anthropic official SDK model provider adapter for agent-memory.",
   "type": "module",
   "author": "Gharibyan",
   "homepage": "https://github.com/gharibyan/agent-memory#readme",
@@ -11,7 +12,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gharibyan/agent-memory.git",
-    "directory": "packages/agent-memory"
+    "directory": "packages/anthropic"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -27,15 +28,11 @@
     "package.json"
   ],
   "scripts": {
-    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json && node ../../scripts/bundle-public-package.mjs",
-    "test": "pnpm build && node --test test/*.test.mjs"
+    "build": "node ../../scripts/clean-dist.mjs && tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.104.1",
-    "@google/genai": "^2.8.0",
-    "openai": "^6.10.0",
-    "pg": "^8.16.3",
-    "sql.js": "^1.13.0"
+    "@agent-memory/core": "workspace:*",
+    "@anthropic-ai/sdk": "^0.104.1"
   },
   "engines": {
     "node": ">=20.12"
@@ -44,6 +41,7 @@
     "ai",
     "agent",
     "memory",
+    "anthropic",
     "llm"
   ],
   "license": "MIT"

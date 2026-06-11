@@ -25,34 +25,46 @@ async function listFiles(dir, suffix) {
 test("source implementation is TypeScript-first", async () => {
   const coreSource = await listFiles("packages/core/src", ".ts")
   const publicSource = await listFiles("packages/agent-memory/src", ".ts")
+  const anthropicSource = await listFiles("packages/anthropic/src", ".ts")
+  const geminiSource = await listFiles("packages/gemini/src", ".ts")
   const localSource = await listFiles("packages/local/src", ".ts")
   const openaiSource = await listFiles("packages/openai/src", ".ts")
   const postgresSource = await listFiles("packages/postgres/src", ".ts")
   const sqliteSource = await listFiles("packages/sqlite/src", ".ts")
+  const xaiSource = await listFiles("packages/xai/src", ".ts")
   const javascriptSource = [
     ...await listFiles("packages/core/src", ".js"),
     ...await listFiles("packages/agent-memory/src", ".js"),
+    ...await listFiles("packages/anthropic/src", ".js"),
+    ...await listFiles("packages/gemini/src", ".js"),
     ...await listFiles("packages/local/src", ".js"),
     ...await listFiles("packages/openai/src", ".js"),
     ...await listFiles("packages/postgres/src", ".js"),
-    ...await listFiles("packages/sqlite/src", ".js")
+    ...await listFiles("packages/sqlite/src", ".js"),
+    ...await listFiles("packages/xai/src", ".js")
   ]
 
   assert.ok(coreSource.length > 4)
+  assert.ok(anthropicSource.some((path) => path.endsWith("index.ts")))
+  assert.ok(geminiSource.some((path) => path.endsWith("index.ts")))
   assert.ok(localSource.some((path) => path.endsWith("index.ts")))
   assert.ok(openaiSource.some((path) => path.endsWith("index.ts")))
   assert.ok(postgresSource.some((path) => path.endsWith("index.ts")))
   assert.ok(sqliteSource.some((path) => path.endsWith("index.ts")))
+  assert.ok(xaiSource.some((path) => path.endsWith("index.ts")))
   assert.deepEqual(javascriptSource, [])
   assert.ok(publicSource.some((path) => path.endsWith("index.ts")))
 })
 
 test("package structure separates internal runtime, adapters, and public package", async () => {
   const corePackage = await readJson("packages/core/package.json")
+  const anthropicPackage = await readJson("packages/anthropic/package.json")
+  const geminiPackage = await readJson("packages/gemini/package.json")
   const localPackage = await readJson("packages/local/package.json")
   const openaiPackage = await readJson("packages/openai/package.json")
   const postgresPackage = await readJson("packages/postgres/package.json")
   const sqlitePackage = await readJson("packages/sqlite/package.json")
+  const xaiPackage = await readJson("packages/xai/package.json")
   const publicPackage = await readJson("packages/agent-memory/package.json")
   const publicIndex = await read("packages/agent-memory/src/index.ts")
 
@@ -66,14 +78,35 @@ test("package structure separates internal runtime, adapters, and public package
   assert.equal(publicPackage.main, "./dist/index.js")
   assert.equal(publicPackage.types, "./dist/index.d.ts")
   assert.equal(Object.keys(publicPackage.dependencies).some((name) => name.startsWith("@agent-memory/")), false)
+  assert.match(publicPackage.dependencies["@anthropic-ai/sdk"], /^\^/)
+  assert.match(publicPackage.dependencies["@google/genai"], /^\^/)
   assert.match(publicPackage.dependencies.openai, /^\^/)
   assert.match(publicPackage.dependencies.pg, /^\^/)
   assert.match(publicPackage.dependencies["sql.js"], /^\^/)
   assert.match(publicIndex, /export \* from "@agent-memory\/core"/)
+  assert.match(publicIndex, /export \{ anthropic \} from "@agent-memory\/anthropic"/)
+  assert.match(publicIndex, /export \{ gemini \} from "@agent-memory\/gemini"/)
   assert.match(publicIndex, /export \{ localMemory \} from "@agent-memory\/local"/)
   assert.match(publicIndex, /export \{ openAICompatible, openai \} from "@agent-memory\/openai"/)
   assert.match(publicIndex, /export \{ postgresMemory \} from "@agent-memory\/postgres"/)
   assert.match(publicIndex, /export \{ sqliteMemory \} from "@agent-memory\/sqlite"/)
+  assert.match(publicIndex, /export \{ xai \} from "@agent-memory\/xai"/)
+
+  assert.equal(anthropicPackage.name, "@agent-memory/anthropic")
+  assert.equal(anthropicPackage.private, true)
+  assert.equal(anthropicPackage.main, "./dist/index.js")
+  assert.equal(anthropicPackage.types, "./dist/index.d.ts")
+  assert.equal(anthropicPackage.dependencies["@agent-memory/core"], "workspace:*")
+  assert.match(anthropicPackage.dependencies["@anthropic-ai/sdk"], /^\^/)
+  assert.deepEqual(anthropicPackage.files, ["dist", "README.md", "package.json"])
+
+  assert.equal(geminiPackage.name, "@agent-memory/gemini")
+  assert.equal(geminiPackage.private, true)
+  assert.equal(geminiPackage.main, "./dist/index.js")
+  assert.equal(geminiPackage.types, "./dist/index.d.ts")
+  assert.equal(geminiPackage.dependencies["@agent-memory/core"], "workspace:*")
+  assert.match(geminiPackage.dependencies["@google/genai"], /^\^/)
+  assert.deepEqual(geminiPackage.files, ["dist", "README.md", "package.json"])
 
   assert.equal(localPackage.name, "@agent-memory/local")
   assert.equal(localPackage.private, true)
@@ -104,12 +137,20 @@ test("package structure separates internal runtime, adapters, and public package
   assert.equal(sqlitePackage.dependencies["@agent-memory/core"], "workspace:*")
   assert.match(sqlitePackage.dependencies["sql.js"], /^\^/)
   assert.deepEqual(sqlitePackage.files, ["dist", "README.md", "package.json"])
+
+  assert.equal(xaiPackage.name, "@agent-memory/xai")
+  assert.equal(xaiPackage.private, true)
+  assert.equal(xaiPackage.main, "./dist/index.js")
+  assert.equal(xaiPackage.types, "./dist/index.d.ts")
+  assert.equal(xaiPackage.dependencies["@agent-memory/core"], "workspace:*")
+  assert.match(xaiPackage.dependencies.openai, /^\^/)
+  assert.deepEqual(xaiPackage.files, ["dist", "README.md", "package.json"])
 })
 
 test("root scripts build TypeScript before test and package checks", async () => {
   const packageJson = await readJson("package.json")
 
-  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter agent-memory build")
+  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter agent-memory build")
   assert.match(packageJson.scripts.test, /pnpm build/)
   assert.equal(packageJson.scripts["pack:check"], "pnpm --filter agent-memory pack --dry-run")
   assert.match(packageJson.devDependencies.typescript, /^\^/)
