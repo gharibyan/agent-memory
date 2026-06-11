@@ -87,3 +87,68 @@ test("openAICompatible streams through an official-SDK-shaped client", async () 
 
   assert.deepEqual(chunks, ["one", " two"])
 })
+
+test("openai uses max_completion_tokens for first-party OpenAI chat models", async () => {
+  const { openai } = await import("../packages/openai/dist/index.js")
+  const calls = []
+  const provider = openai({
+    model: "gpt-5.4-mini",
+    client: {
+      chat: {
+        completions: {
+          async create(input) {
+            calls.push(input)
+            return {
+              choices: [{
+                message: { content: "openai response" },
+                finish_reason: "stop"
+              }]
+            }
+          }
+        }
+      }
+    }
+  })
+
+  await provider.generate({
+    messages: [{ role: "user", content: "hello" }],
+    maxTokens: 128
+  })
+
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].max_completion_tokens, 128)
+  assert.equal("max_tokens" in calls[0], false)
+})
+
+test("openai streams with max_completion_tokens for first-party OpenAI chat models", async () => {
+  const { openai } = await import("../packages/openai/dist/index.js")
+  const calls = []
+  const provider = openai({
+    model: "gpt-5.4-mini",
+    client: {
+      chat: {
+        completions: {
+          async create(input) {
+            calls.push(input)
+            return (async function * streamChunks() {
+              yield { choices: [{ delta: { content: "ok" } }] }
+            })()
+          }
+        }
+      }
+    }
+  })
+  const chunks = []
+
+  for await (const chunk of provider.stream({
+    messages: [{ role: "user", content: "stream" }],
+    maxTokens: 96
+  })) {
+    chunks.push(chunk)
+  }
+
+  assert.deepEqual(chunks, ["ok"])
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].max_completion_tokens, 96)
+  assert.equal("max_tokens" in calls[0], false)
+})
