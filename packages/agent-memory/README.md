@@ -4,6 +4,19 @@ TypeScript SDK for building AI agents with automatic, scoped, persistent memory.
 
 Full project documentation: [github.com/gharibyan/agent-memory](https://github.com/gharibyan/agent-memory).
 
+## Install
+
+```sh
+npm install agent-memory-sdk
+```
+
+```sh
+pnpm add agent-memory-sdk
+yarn add agent-memory-sdk
+```
+
+## Quick Start
+
 ```ts
 import { createAgent, openai } from "agent-memory-sdk"
 

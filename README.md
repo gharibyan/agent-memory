@@ -6,8 +6,17 @@ TypeScript SDK for building AI agents with automatic, scoped, persistent memory.
 
 ## Install
 
+Install from npm:
+
+```sh
+npm install agent-memory-sdk
+```
+
+Or with another package manager:
+
 ```sh
 pnpm add agent-memory-sdk
+yarn add agent-memory-sdk
 ```
 
 For workspace development:
