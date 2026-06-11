@@ -5,14 +5,10 @@ TypeScript SDK for building AI agents with automatic, scoped, persistent memory.
 Full project documentation: [github.com/gharibyan/agent-memory](https://github.com/gharibyan/agent-memory).
 
 ```ts
-import { createAgent, openAICompatible } from "agent-memory"
+import { createAgent, openai } from "agent-memory"
 
 const agent = createAgent({
-  model: openAICompatible({
-    model: "deepseek-chat",
-    baseURL: "https://api.deepseek.com/v1",
-    apiKey: process.env.DEEPSEEK_API_KEY
-  })
+  model: openai("gpt-5")
 })
 
 const result = await agent.generate({
@@ -26,5 +22,7 @@ const result = await agent.generate({
 
 console.log(result.text)
 ```
+
+First-party helpers include `openai()`, `anthropic()`, `gemini()`, and `xai()`. Use `openAICompatible()` for custom chat-completions endpoints.
 
 If `userId` is omitted, memory is stored in the shared default scope. Local memory defaults to `.memory/memory.json`; use `sqliteMemory()` for `.memory/memory.sqlite` or `postgresMemory()` for Postgres with automatic pgvector migrations.

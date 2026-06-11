@@ -9,6 +9,9 @@ This repo is a TypeScript-first pnpm workspace for the `agent-memory` SDK.
 - `packages/sqlite` (`@agent-memory/sqlite`) owns real SQLite `.memory/memory.sqlite` persistence.
 - `packages/postgres` (`@agent-memory/postgres`) owns Postgres persistence, automatic migrations, and pgvector search.
 - `packages/openai` (`@agent-memory/openai`) owns OpenAI model calls through the official `openai` SDK, plus compatible custom endpoint support.
+- `packages/anthropic` (`@agent-memory/anthropic`) owns Anthropic model calls through the official `@anthropic-ai/sdk` package.
+- `packages/gemini` (`@agent-memory/gemini`) owns Gemini model calls through the official `@google/genai` package.
+- `packages/xai` (`@agent-memory/xai`) owns xAI model calls through the documented OpenAI SDK-compatible client path with xAI defaults.
 - `packages/agent-memory` is the public convenience package. It should keep `createAgent({ model })` easy and automatic.
 - `apps/playground` is private and must never ship in npm packages.
 

@@ -29,6 +29,9 @@ test("github ci runs lint, tests, and package boundary check", async () => {
   assert.match(workflow, /pnpm --filter @agent-memory\/sqlite pack --dry-run/)
   assert.match(workflow, /pnpm --filter @agent-memory\/postgres pack --dry-run/)
   assert.match(workflow, /pnpm --filter @agent-memory\/openai pack --dry-run/)
+  assert.match(workflow, /pnpm --filter @agent-memory\/anthropic pack --dry-run/)
+  assert.match(workflow, /pnpm --filter @agent-memory\/gemini pack --dry-run/)
+  assert.match(workflow, /pnpm --filter @agent-memory\/xai pack --dry-run/)
   assert.match(workflow, /pnpm --filter agent-memory pack --dry-run/)
 })
 
@@ -46,13 +49,16 @@ test("github publish workflow is tag gated and syncs package version from tag", 
   assert.match(workflow, /pnpm --filter @agent-memory\/sqlite publish --access public --no-git-checks/)
   assert.match(workflow, /pnpm --filter @agent-memory\/postgres publish --access public --no-git-checks/)
   assert.match(workflow, /pnpm --filter @agent-memory\/openai publish --access public --no-git-checks/)
+  assert.match(workflow, /pnpm --filter @agent-memory\/anthropic publish --access public --no-git-checks/)
+  assert.match(workflow, /pnpm --filter @agent-memory\/gemini publish --access public --no-git-checks/)
+  assert.match(workflow, /pnpm --filter @agent-memory\/xai publish --access public --no-git-checks/)
   assert.match(workflow, /pnpm --filter agent-memory publish --access public --no-git-checks/)
 })
 
 test("root package exposes lint and version sync scripts", async () => {
   const packageJson = await readJson("package.json")
 
-  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter agent-memory build")
+  assert.equal(packageJson.scripts.build, "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter agent-memory build")
   assert.equal(packageJson.scripts.lint, "eslint .")
   assert.equal(packageJson.scripts["version:from-tag"], "node scripts/sync-package-version-from-tag.mjs")
 })
@@ -73,23 +79,37 @@ test("version sync script updates the publishable package from a v-prefixed tag"
   try {
     const { mkdir } = await import("node:fs/promises")
     const publicPackageDir = join(tempDir, "packages", "agent-memory")
+    const anthropicPackageDir = join(tempDir, "packages", "anthropic")
     const corePackageDir = join(tempDir, "packages", "core")
+    const geminiPackageDir = join(tempDir, "packages", "gemini")
     const localPackageDir = join(tempDir, "packages", "local")
     const openaiPackageDir = join(tempDir, "packages", "openai")
     const postgresPackageDir = join(tempDir, "packages", "postgres")
     const sqlitePackageDir = join(tempDir, "packages", "sqlite")
+    const xaiPackageDir = join(tempDir, "packages", "xai")
     await mkdir(publicPackageDir, { recursive: true })
+    await mkdir(anthropicPackageDir, { recursive: true })
     await mkdir(corePackageDir, { recursive: true })
+    await mkdir(geminiPackageDir, { recursive: true })
     await mkdir(localPackageDir, { recursive: true })
     await mkdir(openaiPackageDir, { recursive: true })
     await mkdir(postgresPackageDir, { recursive: true })
     await mkdir(sqlitePackageDir, { recursive: true })
+    await mkdir(xaiPackageDir, { recursive: true })
     await writeFile(join(publicPackageDir, "package.json"), JSON.stringify({
       name: "agent-memory",
       version: "0.0.0"
     }, null, 2))
+    await writeFile(join(anthropicPackageDir, "package.json"), JSON.stringify({
+      name: "@agent-memory/anthropic",
+      version: "0.0.0"
+    }, null, 2))
     await writeFile(join(corePackageDir, "package.json"), JSON.stringify({
       name: "@agent-memory/core",
+      version: "0.0.0"
+    }, null, 2))
+    await writeFile(join(geminiPackageDir, "package.json"), JSON.stringify({
+      name: "@agent-memory/gemini",
       version: "0.0.0"
     }, null, 2))
     await writeFile(join(localPackageDir, "package.json"), JSON.stringify({
@@ -108,33 +128,46 @@ test("version sync script updates the publishable package from a v-prefixed tag"
       name: "@agent-memory/sqlite",
       version: "0.0.0"
     }, null, 2))
+    await writeFile(join(xaiPackageDir, "package.json"), JSON.stringify({
+      name: "@agent-memory/xai",
+      version: "0.0.0"
+    }, null, 2))
 
     const { syncVersionFromTag } = await import(pathToFileURL(new URL("scripts/sync-package-version-from-tag.mjs", root).pathname))
     const result = await syncVersionFromTag("v1.2.3", {
       rootDir: tempDir
     })
     const packageJson = JSON.parse(await readFile(join(publicPackageDir, "package.json"), "utf8"))
+    const anthropicPackageJson = JSON.parse(await readFile(join(anthropicPackageDir, "package.json"), "utf8"))
     const corePackageJson = JSON.parse(await readFile(join(corePackageDir, "package.json"), "utf8"))
+    const geminiPackageJson = JSON.parse(await readFile(join(geminiPackageDir, "package.json"), "utf8"))
     const localPackageJson = JSON.parse(await readFile(join(localPackageDir, "package.json"), "utf8"))
     const openaiPackageJson = JSON.parse(await readFile(join(openaiPackageDir, "package.json"), "utf8"))
     const postgresPackageJson = JSON.parse(await readFile(join(postgresPackageDir, "package.json"), "utf8"))
     const sqlitePackageJson = JSON.parse(await readFile(join(sqlitePackageDir, "package.json"), "utf8"))
+    const xaiPackageJson = JSON.parse(await readFile(join(xaiPackageDir, "package.json"), "utf8"))
 
     assert.equal(result.version, "1.2.3")
     assert.deepEqual(result.updatedPackagePaths.sort(), [
       "packages/agent-memory/package.json",
+      "packages/anthropic/package.json",
       "packages/core/package.json",
+      "packages/gemini/package.json",
       "packages/local/package.json",
       "packages/openai/package.json",
       "packages/postgres/package.json",
-      "packages/sqlite/package.json"
+      "packages/sqlite/package.json",
+      "packages/xai/package.json"
     ].sort())
     assert.equal(packageJson.version, "1.2.3")
+    assert.equal(anthropicPackageJson.version, "1.2.3")
     assert.equal(corePackageJson.version, "1.2.3")
+    assert.equal(geminiPackageJson.version, "1.2.3")
     assert.equal(localPackageJson.version, "1.2.3")
     assert.equal(openaiPackageJson.version, "1.2.3")
     assert.equal(postgresPackageJson.version, "1.2.3")
     assert.equal(sqlitePackageJson.version, "1.2.3")
+    assert.equal(xaiPackageJson.version, "1.2.3")
   } finally {
     await rm(tempDir, { recursive: true, force: true })
   }

@@ -39,11 +39,14 @@ test("publishable packages point to the gharibyan GitHub repository", async () =
   for (const path of [
     "package.json",
     "packages/agent-memory/package.json",
+    "packages/anthropic/package.json",
     "packages/core/package.json",
+    "packages/gemini/package.json",
     "packages/local/package.json",
     "packages/sqlite/package.json",
     "packages/postgres/package.json",
-    "packages/openai/package.json"
+    "packages/openai/package.json",
+    "packages/xai/package.json"
   ]) {
     const packageJson = await readJson(path)
 

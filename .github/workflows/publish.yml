@@ -60,6 +60,15 @@ jobs:
       - name: Verify OpenAI adapter package contents
         run: pnpm --filter @agent-memory/openai pack --dry-run
 
+      - name: Verify Anthropic adapter package contents
+        run: pnpm --filter @agent-memory/anthropic pack --dry-run
+
+      - name: Verify Gemini adapter package contents
+        run: pnpm --filter @agent-memory/gemini pack --dry-run
+
+      - name: Verify xAI adapter package contents
+        run: pnpm --filter @agent-memory/xai pack --dry-run
+
       - name: Verify public package contents
         run: pnpm --filter agent-memory pack --dry-run
 
@@ -85,6 +94,21 @@ jobs:
 
       - name: Publish OpenAI adapter
         run: pnpm --filter @agent-memory/openai publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish Anthropic adapter
+        run: pnpm --filter @agent-memory/anthropic publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish Gemini adapter
+        run: pnpm --filter @agent-memory/gemini publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish xAI adapter
+        run: pnpm --filter @agent-memory/xai publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

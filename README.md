@@ -101,12 +101,29 @@ The Postgres adapter runs migrations automatically before the first memory opera
 
 ## Model Providers
 
-First-party provider integrations should use official SDKs. The OpenAI adapter depends on the official `openai` TypeScript SDK:
+First-party provider integrations should use provider SDKs or documented provider client paths. The OpenAI adapter depends on the official `openai` TypeScript SDK:
 
 ```ts
 import { openai } from "agent-memory"
 
 const model = openai("gpt-5")
+```
+
+Anthropic and Gemini live in their own adapter packages and are also re-exported by `agent-memory`:
+
+```ts
+import { anthropic, gemini } from "agent-memory"
+
+const anthropicModel = anthropic("anthropic-model")
+const geminiModel = gemini("gemini-2.5-pro")
+```
+
+xAI has a first-class package too. It uses the documented OpenAI SDK-compatible client path with xAI defaults:
+
+```ts
+import { xai } from "agent-memory"
+
+const model = xai("grok-4")
 ```
 
 Use the OpenAI-compatible helper only for custom providers that expose a compatible chat completions API:
@@ -129,6 +146,9 @@ const model = openAICompatible({
 - `@agent-memory/sqlite`: real SQLite persistence adapter.
 - `@agent-memory/postgres`: Postgres persistence adapter with pgvector migrations.
 - `@agent-memory/openai`: OpenAI official SDK adapter, plus OpenAI-compatible custom endpoint support.
+- `@agent-memory/anthropic`: Anthropic official SDK adapter.
+- `@agent-memory/gemini`: Gemini official SDK adapter.
+- `@agent-memory/xai`: xAI adapter using the documented OpenAI SDK-compatible client path.
 
 ## Playground
 

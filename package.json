@@ -19,11 +19,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter agent-memory build",
+    "build": "pnpm --filter @agent-memory/core build && pnpm --filter @agent-memory/local build && pnpm --filter @agent-memory/sqlite build && pnpm --filter @agent-memory/postgres build && pnpm --filter @agent-memory/openai build && pnpm --filter @agent-memory/anthropic build && pnpm --filter @agent-memory/gemini build && pnpm --filter @agent-memory/xai build && pnpm --filter agent-memory build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "pnpm build && node --test packages/agent-memory/test/*.test.mjs test/*.test.mjs",
-    "pack:check": "pnpm --filter @agent-memory/core pack --dry-run && pnpm --filter @agent-memory/local pack --dry-run && pnpm --filter @agent-memory/sqlite pack --dry-run && pnpm --filter @agent-memory/postgres pack --dry-run && pnpm --filter @agent-memory/openai pack --dry-run && pnpm --filter agent-memory pack --dry-run",
+    "pack:check": "pnpm --filter @agent-memory/core pack --dry-run && pnpm --filter @agent-memory/local pack --dry-run && pnpm --filter @agent-memory/sqlite pack --dry-run && pnpm --filter @agent-memory/postgres pack --dry-run && pnpm --filter @agent-memory/openai pack --dry-run && pnpm --filter @agent-memory/anthropic pack --dry-run && pnpm --filter @agent-memory/gemini pack --dry-run && pnpm --filter @agent-memory/xai pack --dry-run && pnpm --filter agent-memory pack --dry-run",
     "version:from-tag": "node scripts/sync-package-version-from-tag.mjs"
   },
   "devDependencies": {

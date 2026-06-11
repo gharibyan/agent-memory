@@ -25,6 +25,9 @@ Use this when:
 - `@agent-memory/sqlite`: real SQLite `.memory/memory.sqlite` persistence.
 - `@agent-memory/postgres`: Postgres persistence with automatic migrations and pgvector retrieval.
 - `@agent-memory/openai`: OpenAI chat completions through the official `openai` SDK, including custom `baseURL` providers for compatible endpoints.
+- `@agent-memory/anthropic`: Anthropic messages through the official `@anthropic-ai/sdk` package.
+- `@agent-memory/gemini`: Gemini generation through the official `@google/genai` package.
+- `@agent-memory/xai`: xAI chat completions through the documented OpenAI SDK-compatible client path with xAI defaults.
 - `agent-memory`: public convenience package. `createAgent({ model })` should work with automatic local memory.
 
 ## Basic Usage
@@ -54,7 +57,7 @@ const result = await agent.generate({
 
 ## Extending
 
-For a provider adapter, create a package like `@agent-memory/openai` and return a `ModelProvider`. Major first-party provider packages should depend on the provider's official SDK; OpenAI-compatible wrappers are for custom model endpoints.
+For a provider adapter, create a package like `@agent-memory/openai` and return a `ModelProvider`. Major first-party provider packages should depend on the provider's official SDK when one exists; OpenAI-compatible wrappers are for custom model endpoints and documented compatible providers.
 
 For a storage adapter, create a package like `@agent-memory/local` and implement `MemoryStore`. Database adapters should own their migration lifecycle instead of making application code run setup manually.
 
