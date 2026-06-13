@@ -192,6 +192,10 @@ pnpm pack:check
 
 Package dry-runs must only publish the `agent-memory-sdk` artifact and must not include `apps/playground`, `.memory`, local databases, logs, screenshots, or generated tarballs.
 
+## Contributing
+
+Issues and pull requests are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request, and use [SECURITY.md](./SECURITY.md) for private vulnerability reports.
+
 ## License
 
 MIT License. See [LICENSE](./LICENSE).

@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest an improvement or new adapter for agent-memory-sdk.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to build, and where does the SDK get in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API or behavior
+      description: Show the TypeScript API or behavior you would expect.
+      render: ts
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - agent runtime
+        - memory retrieval
+        - local storage
+        - SQLite
+        - Postgres
+        - model provider
+        - packaging
+        - docs
+        - examples
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workaround are you using today?
+    validations:
+      required: false
