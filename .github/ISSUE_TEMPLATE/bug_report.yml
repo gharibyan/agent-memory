@@ -1,0 +1,75 @@
+name: Bug report
+description: Report a reproducible problem in agent-memory-sdk.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please remove secrets, API keys, database
+        credentials, local memory files, and production logs before posting.
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      description: Which version of agent-memory-sdk are you using?
+      placeholder: "0.0.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      options:
+        - Node.js
+        - Bun
+        - Deno
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: adapter
+    attributes:
+      label: Memory or provider adapter
+      options:
+        - local
+        - sqlite
+        - postgres
+        - openai
+        - anthropic
+        - gemini
+        - xai
+        - openAICompatible
+        - core
+        - not sure
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Share the smallest code sample or repository that reproduces the issue.
+      render: ts
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include OS, package manager, Node.js version, and relevant database/provider details.
+      placeholder: "macOS 15, Node.js 22, pnpm 10"
+    validations:
+      required: false

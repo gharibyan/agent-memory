@@ -67,6 +67,27 @@ test("github codeowners routes repository changes to gharibyan", async () => {
   assert.match(codeowners, /^\* @gharibyan$/m)
 })
 
+test("github community health files are present", async () => {
+  const codeOfConduct = await read("CODE_OF_CONDUCT.md")
+  const contributing = await read("CONTRIBUTING.md")
+  const security = await read("SECURITY.md")
+  const pullRequestTemplate = await read(".github/PULL_REQUEST_TEMPLATE.md")
+  const issueConfig = await read(".github/ISSUE_TEMPLATE/config.yml")
+  const bugReport = await read(".github/ISSUE_TEMPLATE/bug_report.yml")
+  const featureRequest = await read(".github/ISSUE_TEMPLATE/feature_request.yml")
+  const question = await read(".github/ISSUE_TEMPLATE/question.yml")
+
+  assert.match(codeOfConduct, /Contributor Covenant/)
+  assert.match(contributing, /agent-memory-sdk/)
+  assert.match(contributing, /pnpm pack:check/)
+  assert.match(security, /Reporting a Vulnerability/)
+  assert.match(pullRequestTemplate, /Package Safety/)
+  assert.match(issueConfig, /blank_issues_enabled: false/)
+  assert.match(bugReport, /Bug report/)
+  assert.match(featureRequest, /Feature request/)
+  assert.match(question, /Question/)
+})
+
 test("gitignore excludes local IDE project settings", async () => {
   const gitignore = await read(".gitignore")
 
