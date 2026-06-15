@@ -1,6 +1,7 @@
 export { createAgent } from "./agent.js"
 export { createDefaultCompiler, canonicalKeyFor, validateMemoryPatch } from "./compiler.js"
 export { createMemoryStore, makeEmbedding, makeEvent, tokenize } from "./memory-store.js"
+export { migrateMemory } from "./migration.js"
 export { customModel } from "./providers.js"
 export { retrieveMemoryContext } from "./retrieval.js"
 export { resolveScope, targetScopeKeys } from "./scopes.js"

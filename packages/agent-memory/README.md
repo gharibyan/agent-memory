@@ -39,3 +39,23 @@ console.log(result.text)
 First-party helpers include `openai()`, `anthropic()`, `gemini()`, and `xai()`. Use `openAICompatible()` for custom chat-completions endpoints.
 
 If `userId` is omitted, memory is stored in the shared default scope. Local memory defaults to `.memory/memory.json`; use `sqliteMemory()` for `.memory/memory.sqlite` or `postgresMemory()` for Postgres with automatic pgvector migrations.
+
+## Data Migration
+
+Seed existing app data by passing normalized memories or events to the configured memory store:
+
+```ts
+await agent.memory.migrate({
+  userId: "user_123",
+  data: [
+    {
+      type: "preference",
+      content: "User prefers concise weekly reports.",
+      confidence: 0.9,
+      importance: 0.8
+    }
+  ]
+})
+```
+
+The SDK only validates and stores mapped input. Your app owns where the data comes from and how it is mapped. Use `events` and `sourceEventIds` when you want imported memories linked to imported history, and `mode: "skipExisting"` to leave matching memories unchanged.

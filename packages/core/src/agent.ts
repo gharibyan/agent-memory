@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { createDefaultCompiler, canonicalKeyFor, validateMemoryPatch } from "./compiler.js"
 import { createMemoryStore, makeEmbedding, makeEvent } from "./memory-store.js"
+import { migrateMemory } from "./migration.js"
 import { retrieveMemoryContext } from "./retrieval.js"
 import { resolveScope, targetScopeKeys } from "./scopes.js"
 import type {
@@ -10,6 +11,7 @@ import type {
   CompilerProvider,
   GenerateInput,
   GenerateResult,
+  MemoryMigrationInput,
   MemoryPatch,
   MemoryRecord,
   MemoryScopeInput,
@@ -219,6 +221,11 @@ export function createAgent(config: AgentConfig): Agent {
           query: query.query,
           limit: query.limit
         })
+      },
+
+      async migrate(input: MemoryMigrationInput) {
+        ensureStore(store)
+        return migrateMemory({ store, migration: input })
       },
 
       async delete(memoryId: string) {

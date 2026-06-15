@@ -61,6 +61,49 @@ If `userId` is omitted, memory is stored in the shared default scope. That is us
 - `memory.learn: false`: disables learning for a single call.
 - `memory.recall: false`: disables recall for a single call.
 
+## Data Migration
+
+Use `agent.memory.migrate()` when an app already has memory-like data and wants to seed the configured persistence layer. The SDK does not fetch or map source data; pass normalized memories or events from your own import code.
+
+```ts
+await agent.memory.migrate({
+  userId: "user_123",
+  data: [
+    {
+      type: "preference",
+      content: "User prefers concise weekly reports.",
+      confidence: 0.9,
+      importance: 0.8
+    }
+  ]
+})
+```
+
+Migration validates the input, resolves the target scope, writes through the configured memory store, links source events when provided, creates a synthetic source event for bare memory rows, and stores embeddings so imported memory can be recalled immediately. Use `mode: "skipExisting"` to preserve an existing memory with the same ID or canonical key.
+
+```ts
+await agent.memory.migrate({
+  userId: "user_123",
+  mode: "skipExisting",
+  events: [
+    {
+      id: "evt_legacy_1",
+      role: "user",
+      content: "Legacy note: the customer portal was renamed to Atlas."
+    }
+  ],
+  memories: [
+    {
+      id: "mem_legacy_1",
+      type: "fact",
+      content: "The customer portal was renamed to Atlas.",
+      canonicalKey: "fact:customer-portal-renamed",
+      sourceEventIds: ["evt_legacy_1"]
+    }
+  ]
+})
+```
+
 ## Storage
 
 The public `agent-memory-sdk` package defaults to local JSON persistence:
