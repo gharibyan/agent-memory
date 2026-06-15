@@ -114,6 +114,7 @@ export type Agent = {
   memory: {
     list(query?: MemoryListQuery): Promise<MemoryRecord[]>
     search(query?: MemorySearchQuery): Promise<MemoryRecord[]>
+    migrate(input: MemoryMigrationInput): Promise<MemoryMigrationResult>
     delete(memoryId: string): Promise<void>
     forget(query?: MemoryScopeInput): Promise<void>
     export(query?: MemoryScopeInput): Promise<MemoryExport>
@@ -196,6 +197,62 @@ export type VectorResult = {
 export type MemoryExport = {
   memories: MemoryRecord[]
   events: MemoryEvent[]
+}
+
+export type MemoryMigrationMode = "upsert" | "skipExisting"
+
+export type MemoryMigrationInput = MemoryScopeInput & {
+  data?: MemoryMigrationItem[]
+  memories?: MemoryMigrationItem[]
+  events?: MemoryMigrationEvent[]
+  mode?: MemoryMigrationMode
+}
+
+export type MemoryMigrationItem = {
+  id?: string
+  scopeKey?: string
+  type?: MemoryRecordType
+  content: string
+  canonicalKey?: string
+  confidence?: number
+  importance?: number
+  sensitivity?: MemoryRecord["sensitivity"]
+  status?: MemoryRecord["status"]
+  sourceEventIds?: string[]
+  createdAt?: string
+  updatedAt?: string
+}
+
+export type MemoryMigrationEvent = {
+  id?: string
+  scopeKey?: string
+  threadId?: string
+  operationId?: string
+  role?: AgentRole
+  content: string
+  metadata?: Record<string, unknown>
+  createdAt?: string
+}
+
+export type MemoryMigrationFailure = {
+  target: "memory" | "event"
+  index: number
+  reason: string
+}
+
+export type MemoryMigrationResult = {
+  memories: {
+    created: number
+    updated: number
+    skipped: number
+    failed: number
+  }
+  events: {
+    imported: number
+    skipped: number
+    failed: number
+  }
+  failures: MemoryMigrationFailure[]
 }
 
 export type MemoryStore = {

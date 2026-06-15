@@ -101,6 +101,121 @@ test("generate without userId writes to the default scope", async () => {
   assert.match(memories[0]?.content ?? "", /prefers? short answers/i)
 })
 
+test("memory migration imports caller-mapped data and makes it recallable", async () => {
+  const seenRequests = []
+  const agent = createAgent({
+    model: customModel({
+      id: "test-model",
+      generate: async (request) => {
+        seenRequests.push(request)
+        return { text: "ok" }
+      }
+    }),
+    memory: createMemoryStore()
+  })
+
+  const report = await agent.memory.migrate({
+    userId: "migrated_user",
+    data: [
+      {
+        type: "preference",
+        content: "User prefers dashboard summaries as bullet lists.",
+        confidence: 0.92,
+        importance: 0.81
+      }
+    ]
+  })
+
+  assert.equal(report.memories.created, 1)
+  assert.equal(report.memories.updated, 0)
+  assert.equal(report.memories.skipped, 0)
+  assert.equal(report.memories.failed, 0)
+  assert.equal(report.events.imported, 1)
+  assert.deepEqual(report.failures, [])
+
+  const memories = await agent.memory.list({ userId: "migrated_user" })
+  assert.equal(memories.length, 1)
+  assert.equal(memories[0]?.scopeKey, "user:migrated_user")
+  assert.equal(memories[0]?.type, "preference")
+  assert.match(memories[0]?.canonicalKey ?? "", /^preference:/)
+
+  await agent.generate({
+    userId: "migrated_user",
+    messages: [
+      { role: "user", content: "How should I format the dashboard summary?" }
+    ],
+    debug: true
+  })
+
+  const recalledRequest = seenRequests.at(-1)
+  assert.equal(recalledRequest.messages[0]?.role, "system")
+  assert.match(recalledRequest.messages[0]?.content ?? "", /dashboard summaries as bullet lists/i)
+})
+
+test("memory migration imports mapped events and can skip existing memories", async () => {
+  const agent = createAgent({
+    model: customModel({
+      id: "test-model",
+      generate: async () => ({ text: "ok" })
+    }),
+    memory: createMemoryStore()
+  })
+
+  const first = await agent.memory.migrate({
+    userId: "legacy_user",
+    threadId: "legacy_thread",
+    operationId: "legacy_import",
+    events: [
+      {
+        id: "evt_legacy_1",
+        role: "user",
+        content: "Legacy note: the customer portal was renamed to Atlas.",
+        metadata: { source: "legacy-export" },
+        createdAt: "2026-01-01T00:00:00.000Z"
+      }
+    ],
+    memories: [
+      {
+        id: "mem_legacy_1",
+        type: "fact",
+        content: "The customer portal was renamed to Atlas.",
+        canonicalKey: "fact:customer-portal-renamed",
+        sourceEventIds: ["evt_legacy_1"],
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z"
+      }
+    ]
+  })
+
+  assert.equal(first.events.imported, 1)
+  assert.equal(first.memories.created, 1)
+  assert.equal(first.memories.updated, 0)
+
+  const second = await agent.memory.migrate({
+    userId: "legacy_user",
+    mode: "skipExisting",
+    memories: [
+      {
+        type: "fact",
+        content: "The customer portal has a different migrated description.",
+        canonicalKey: "fact:customer-portal-renamed"
+      }
+    ]
+  })
+
+  assert.equal(second.memories.created, 0)
+  assert.equal(second.memories.updated, 0)
+  assert.equal(second.memories.skipped, 1)
+
+  const memories = await agent.memory.list({ userId: "legacy_user" })
+  const exported = await agent.memory.export({ userId: "legacy_user" })
+
+  assert.equal(memories.length, 1)
+  assert.equal(memories[0]?.id, "mem_legacy_1")
+  assert.equal(memories[0]?.content, "The customer portal was renamed to Atlas.")
+  assert.equal(exported.events.some((event) => event.id === "evt_legacy_1"), true)
+})
+
 test("stream returns text and commits memory after consumption", async () => {
   const agent = createAgent({
     model: customModel({
